@@ -69,7 +69,7 @@ const LogInPage = () => {
             />
             <Button 
                 title="Don't have an account? Sign Up"
-                onPress={() => navigation.navigate('SignUp')}
+                onPress={() => navigation.navigate('Goals')}
             />
         </View>
     );
