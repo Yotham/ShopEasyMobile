@@ -23,7 +23,17 @@ function AppNavigation() {
   }
 
   return (
-    <Stack.Navigator>
+    <Stack.Navigator
+      screenOptions={{
+        headerStyle: {
+          backgroundColor: '#121212', // Dark mode header background color
+        },
+        headerTintColor: '#fff', // Dark mode header text color
+        headerTitleStyle: {
+          fontWeight: 'bold',
+        },
+      }}
+    >
       {userLoggedIn ? (
         // User is logged in
         <>
@@ -33,7 +43,7 @@ function AppNavigation() {
       ) : (
         // User is not logged in
         <>
-          <Stack.Screen name="LogIn" component={LogInPage} options={{ headerShown: false }}/>
+          <Stack.Screen name="LogIn" component={LogInPage} options={{ headerShown: false, title: 'Log In' }}/>
           <Stack.Screen name="Goals" component={Registration.Goals} options={{ title: 'Goals' }}/>
           <Stack.Screen name="UserInformationGenderAge" component={Registration.UserInformationGenderAge} options={{ title: 'About You' }}/>
           <Stack.Screen name="UserInformationHeightWeight" component={Registration.UserInformationHeightWeight} options={{ title: 'About You' }}/>

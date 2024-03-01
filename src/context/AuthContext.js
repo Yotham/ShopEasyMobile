@@ -1,7 +1,7 @@
 import React, { createContext, useState, useContext, useEffect, useMemo } from 'react';
 import * as SecureStore from 'expo-secure-store';
 
-const ip = 'https://shop-easy-flax.vercel.app';
+const ip = 'https://shop-ez.netlify.app/';
 
 const AuthContext = createContext();
 

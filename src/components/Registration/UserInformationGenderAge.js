@@ -1,93 +1,56 @@
 import React from 'react';
-import { View, TextInput, Button, StyleSheet } from 'react-native';
-import { Picker } from '@react-native-picker/picker';
+import { View, TextInput, TouchableOpacity, Text, Button, StyleSheet } from 'react-native';
 import { useRegistration } from './RegistrationProvider'; // Ensure the path is correct
+import { styles } from './RegistrationStyles'; // Assuming styles are defined here
 
 function UserInformationGenderAge({ navigation }) {
-    // Access global state and functions via useRegistration hook
     const { userData, handleChange } = useRegistration();
 
-    // Utilize userData for gender and age, and manage changes with handleChange
+    const selectGender = (gender) => {
+        handleChange('gender', gender);
+    };
+
     return (
-        <View style={styles.container}>
-            <Picker
-                selectedValue={userData.gender} // Use gender from global state
-                style={styles.input}
-                onValueChange={(itemValue) => handleChange('gender', itemValue)} // Update global state on change
+        <View style={styles.fullScreenContainer}>
+            <View style={styles.contentContainer}>
+            <Text style={styles.label}>What's your gender?</Text>
+            <View style={styles.buttonContainer}>
+                {['Male', 'Female', 'Other'].map((gender) => (
+                    <TouchableOpacity
+                        key={gender}
+                        style={[
+                            styles.button,
+                            userData.gender === gender && styles.selectedButton,
+                        ]}
+                        onPress={() => selectGender(gender)}
+                    >
+                        <Text style={styles.buttonText}>{gender}</Text>
+                    </TouchableOpacity>
+                ))}
+            </View>
+            <Text style={styles.label}>How old are you ?</Text>
+            <View style={styles.inputContainer}>
+                <TextInput
+                    style={styles.input}
+                    placeholder="Age"
+                    value={userData.age.toString()} // Convert age to string for TextInput
+                    onChangeText={(text) => handleChange('age', text)} // Update global state on change
+                    keyboardType="numeric"
+                />
+            </View>
+            <TouchableOpacity
+                style={[styles.nextButton, !userData.age ? { opacity: 0.5 } : {}]} // Make button look disabled if no age
+                onPress={() => {
+                    if (userData.age) { // Check if age is not empty
+                        navigation.navigate('UserInformationHeightWeight');
+                    }
+                }}
             >
-                <Picker.Item label="Male" value="Male" />
-                <Picker.Item label="Female" value="Female" />
-                <Picker.Item label="Other" value="Other" />
-            </Picker>
-            <TextInput
-                style={styles.input}
-                placeholder="Age"
-                value={userData.age.toString()} // Use age from global state, ensure it's a string for TextInput
-                onChangeText={(text) => handleChange('age', text)} // Update global state on change
-                keyboardType="numeric"
-            />
-            <Button title="Next" onPress={() => navigation.navigate('UserInformationHeightWeight')} />
+                <Text style={styles.nextButtonText}>Next</Text>
+            </TouchableOpacity>
+            </View>
         </View>
     );
 }
-
-
-const styles = StyleSheet.create({
-  modal: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: 20, // Consider the overall padding for the screen, not just the modal
-  },
-  form: {
-    flexDirection: 'column',
-    justifyContent: 'center',
-    padding: 10,
-    borderColor: '#e0e0e0',
-    borderWidth: 1,
-    borderRadius: 8,
-    width: 300, // You might want to use a percentage or 'auto' for responsive design
-    backgroundColor: '#f5f5f5',
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 0,
-    },
-    shadowOpacity: 0.2,
-    shadowRadius: 15,
-    elevation: 20, // elevation for Android shadow
-  },
-  label: {
-    flexDirection: 'column',
-    fontSize: 14,
-    fontWeight: '500',
-    marginBottom: 10, // Assuming you want some space between labels
-  },
-  input: {
-    padding: 5,
-    borderRadius: 4,
-    borderColor: '#ccc',
-    borderWidth: 1,
-    fontSize: 14,
-    marginBottom: 5, // To replicate 'gap' for inputs
-  },
-  inputFocus: {
-    borderColor: '#007BFF',
-    // React Native does not have a pseudo-class like ':focus', handling focus requires state management
-  },
-  submitButton: {
-    paddingVertical: 10,
-    paddingHorizontal: 15,
-    backgroundColor: '#007BFF',
-    borderRadius: 4,
-    color: '#fff', // Color property is not used for background color in React Native
-    fontSize: 14,
-    textAlign: 'center', // Align text inside the button
-    marginBottom: 10, // To replicate 'gap' for the button
-  },
-  submitButtonHover: {
-    backgroundColor: '#0056b3', // Note: ':hover' is not supported, you might use Touchable opacity or similar for feedback
-  },
-});
 
 export default UserInformationGenderAge;
