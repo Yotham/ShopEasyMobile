@@ -22,22 +22,30 @@ function AccountInformation() {
   };
 
   return (
-      <View style={styles.container}>
-          <TextInput
-              style={styles.input}
-              placeholder="Username"
-              value={userData.username}
-              onChangeText={(text) => handleChange('username', text)}
-          />
-          <TextInput
-              style={styles.input}
-              placeholder="Password"
-              value={userData.password}
-              onChangeText={(text) => handleChange('password', text)}
-              secureTextEntry={true}
-          />
-          <Button title="Finish" onPress={handleFinishPress} />
-      </View>
+    <View style={styles.fullScreenContainer}>
+        <View style={styles.inputContainer}>
+            <View style={styles.container}>
+                <TextInput
+                    style={styles.input}
+                    placeholder="Username"
+                    value={userData.username}
+                    onChangeText={(text) => handleChange('username', text)}
+                />
+            </View>
+        </View>
+        <View style={styles.inputContainer}>
+            <View style={styles.container}>
+                <TextInput
+                    style={styles.input}
+                    placeholder="Password"
+                    value={userData.password}
+                    onChangeText={(text) => handleChange('password', text)}
+                    secureTextEntry={true}
+                />
+            </View>
+        </View>
+        <Button title="Finish" onPress={handleFinishPress} />
+    </View>
   );
 }
 
