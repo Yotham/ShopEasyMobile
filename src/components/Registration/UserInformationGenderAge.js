@@ -33,9 +33,11 @@ function UserInformationGenderAge({ navigation }) {
                 <TextInput
                     style={styles.input}
                     placeholder="Age"
+                    placeholderTextColor="#555"
                     value={userData.age.toString()} // Convert age to string for TextInput
                     onChangeText={(text) => handleChange('age', text)} // Update global state on change
                     keyboardType="numeric"
+                    maxLength={3}
                 />
             </View>
             <TouchableOpacity

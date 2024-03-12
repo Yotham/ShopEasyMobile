@@ -52,6 +52,7 @@ const LogInPage = () => {
             <TextInput 
                 style={styles.input} 
                 placeholder="Username" 
+                placeholderTextColor="#555"
                 keyboardType="email-address"
                 value={credentials.username}
                 onChangeText={handleUsernameChange} // Update the username in state
@@ -59,6 +60,7 @@ const LogInPage = () => {
             <TextInput 
                 style={styles.input} 
                 placeholder="Password" 
+                placeholderTextColor="#555"
                 secureTextEntry
                 value={credentials.password}
                 onChangeText={handlePasswordChange} // Update the password in state
@@ -81,6 +83,7 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         padding: 30,
+        backgroundColor: '#121212', // Dark background color
     },
     title: {
         paddingBottom: 150,
@@ -88,15 +91,19 @@ const styles = StyleSheet.create({
         fontFamily: 'AvenirNextCondensed-Heavy',
         fontSize: 40,
         marginBottom: 20,
+        color: '#FFFFFF', // Light text color for dark mode
     },
     input: {
         width: '100%',
         padding: 10,
         marginVertical: 10,
         borderWidth: 1,
-        borderColor: 'gray',
+        borderColor: '#333333', // Darker border for inputs
         borderRadius: 5,
+        backgroundColor: '#333333', // Dark input background
+        color: '#FFFFFF', // Light text color for input
     },
 });
+
 
 export default LogInPage;
