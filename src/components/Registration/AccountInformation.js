@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, TextInput, Button, StyleSheet } from 'react-native';
+import { View, TextInput, TouchableOpacity, Text, Button, StyleSheet } from 'react-native';
 import { useRegistration } from './RegistrationProvider';
 import { useNavigation } from '@react-navigation/native';
 import { styles } from './RegistrationStyles';
@@ -17,34 +17,46 @@ function AccountInformation() {
           navigation.navigate('Home');
       } else {
           // Optionally handle the failure case, e.g., show an alert
-          Alert.alert('Registration Failed', 'Please try again.');
+          navigation.navigate('AccountInformation');
       }
   };
 
   return (
     <View style={styles.fullScreenContainer}>
+        <View style={styles.contentContainer}>
         <View style={styles.inputContainer}>
-            <View style={styles.container}>
-                <TextInput
-                    style={styles.input}
-                    placeholder="Username"
-                    value={userData.username}
-                    onChangeText={(text) => handleChange('username', text)}
-                />
-            </View>
+            <TextInput
+                style={styles.input}
+                placeholder="Username"
+                placeholderTextColor="#555"
+                value={userData.username}
+                onChangeText={(text) => handleChange('username', text)}
+                keyboardType= 'default'
+                onFocus={() => handleChange('username', "")}
+            />
         </View>
         <View style={styles.inputContainer}>
-            <View style={styles.container}>
-                <TextInput
-                    style={styles.input}
-                    placeholder="Password"
-                    value={userData.password}
-                    onChangeText={(text) => handleChange('password', text)}
-                    secureTextEntry={true}
-                />
-            </View>
+            <TextInput
+                style={styles.input}
+                placeholder="Password"
+                placeholderTextColor="#555"
+                value={userData.password}
+                onChangeText={(text) => handleChange('password', text)}
+                secureTextEntry={true}
+                keyboardType= 'default'
+            />
         </View>
-        <Button title="Finish" onPress={handleFinishPress} />
+        <TouchableOpacity
+            style={[styles.nextButton, !userData.username || !userData.password ? { opacity: 0.5 } : {}]}
+            onPress={() => {
+                if (userData.username && userData.password) { // Check if age is not empty
+                    handleFinishPress();
+                }
+            }}
+            >
+            <Text style={styles.nextButtonText}>Finish</Text>
+        </TouchableOpacity>
+        </View>
     </View>
   );
 }

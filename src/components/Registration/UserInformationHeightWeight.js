@@ -13,20 +13,20 @@ function UserInformationHeightWeight({ navigation }) {
                 <View style={styles.inputContainer}>
                     <TextInput
                         style={styles.input}
-                        placeholder="Height (Feet)"
                         value={userData.heightFeet.toString()} // Ensure it's a string for TextInput
                         onChangeText={(text) => handleChange('heightFeet', text)} // Update global state
                         keyboardType="numeric"
+                        maxLength={1}
                     />
                     <Text style={styles.inputLabel}>feet</Text>
                 </View>
                 <View style={styles.inputContainer}>
                     <TextInput
                         style={styles.input}
-                        placeholder="Height (Inches)"
                         value={userData.heightInches.toString()} // Ensure it's a string for TextInput
                         onChangeText={(text) => handleChange('heightInches', text)} // Update global state
                         keyboardType="numeric"
+                        maxLength={2}
                     />
                     <Text style={styles.inputLabel}>inches</Text>
                 </View>
@@ -35,13 +35,22 @@ function UserInformationHeightWeight({ navigation }) {
                     <TextInput
                         style={styles.input} // Keep original input styles, ensure text aligns right
                         placeholder="Weight"
+                        placeholderTextColor="#555"
                         value={userData.weight.toString()} // Ensure it's a string for TextInput
                         onChangeText={(text) => handleChange('weight', text)} // Update global state
                         keyboardType="numeric"
+                        maxLength={4}
                     />
                     <Text style={styles.inputLabel}>lbs</Text>
                 </View>
-                <TouchableOpacity style={styles.nextButton} onPress={() => navigation.navigate('AccountInformation')}>
+                <TouchableOpacity
+                    style={[styles.nextButton, !userData.weight ? { opacity: 0.5 } : {}]}
+                    onPress={() => {
+                        if (userData.weight) { // Check if age is not empty
+                            navigation.navigate('AccountInformation');
+                        }
+                    }}
+                    >
                     <Text style={styles.nextButtonText}>Next</Text>
                 </TouchableOpacity>
             </View>
