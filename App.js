@@ -1,4 +1,5 @@
 import React from 'react';
+import { StatusBar } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import LogInPage from './src/pages/LogInPage';
@@ -60,6 +61,7 @@ function App() {
       {/* Wrap NavigationContainer with RegistrationProvider here */}
       <RegistrationProvider>
         <NavigationContainer>
+          <StatusBar barStyle= "light-content" />
           <AppNavigation />
         </NavigationContainer>
       </RegistrationProvider>
