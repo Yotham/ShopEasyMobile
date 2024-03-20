@@ -1,10 +1,10 @@
-// Import React Native components and hooks
 import React, { useState, useEffect, useRef } from 'react';
 import { View, Text, TouchableOpacity, ScrollView, StyleSheet, ActivityIndicator, Modal, SafeAreaView } from 'react-native';
-import { Picker } from '@react-native-picker/picker'; // Assuming you'll use Picker for dropdowns
-import { useAuth } from '../context/AuthContext'; // Adjust this import based on your React Native project structure
+import { Picker } from '@react-native-picker/picker';
+import { useAuth } from '../context/AuthContext';
 import getRandomItems from '../components/ListGeneration.js';
 import { IconButton } from 'react-native-paper';
+import { useNavigation } from '@react-navigation/native';
 
 import HannafordData from '../Data/HannafordData.json';
 import TraderJoesData from '../Data/TraderJoesData.json';
@@ -13,17 +13,15 @@ const GenerateScreen = () => {
   const [randomItems, setRandomItems] = useState([]);
   const [isItemModalOpen, setItemModalOpen] = useState(false);
   const [selectedLabel, setSelectedLabel] = useState('HannafordData');
-  const [selectedData, setSelectedData] = useState(HannafordData); // Adapt data loading for React Native
+  const [selectedData, setSelectedData] = useState(HannafordData);
   const [isLoading, setIsLoading] = useState(true);
-  const { currentUser } = useAuth(); // Make sure your authentication context is adapted for React Native
+  const { currentUser } = useAuth();
   const [showMenu, setShowMenu] = useState(false);
-
+  const navigation = useNavigation();
   const isMounted = useRef(true);
 
   useEffect(() => {
-    const timer = setTimeout(() => {
-      setIsLoading(false);
-    }, 500);
+    const timer = setTimeout(() => {setIsLoading(false);}, 500);
     return () => {
         clearTimeout(timer);
     isMounted.current = false;
@@ -39,8 +37,8 @@ const GenerateScreen = () => {
   }
 
   const handleSelectionChange = (selectedValue) => {
-    setSelectedLabel(selectedValue); // Update the label
-    setSelectedData(selectedValue === 'HannafordData' ? HannafordData : TraderJoesData); // Update the data
+    setSelectedLabel(selectedValue);
+    setSelectedData(selectedValue === 'HannafordData' ? HannafordData : TraderJoesData);
   };
 
   const logout = async () => {
@@ -70,7 +68,6 @@ const GenerateScreen = () => {
                     style={styles.menuItem}
                     onPress={() => {
                         navigation.navigate('Settings'); 
-                        // Implement Account Settings functionality here
                         setShowMenu(false);
                     }}>
                     <Text style={styles.menuItemText}>Account Settings</Text>
@@ -91,10 +88,7 @@ const GenerateScreen = () => {
     if (currentUser && currentUser.caloricGoal) {
       const items = getRandomItems(selectedData, currentUser.caloricGoal);
       const itemObjects = items.map(item => {
-        // Assuming item structure is { name, pageNumber, count }
-        // And selectedData is an array or object from which we can retrieve additional details
         const productData = selectedData[item.pageNumber][item.name];
-
         return {
           name: item.name,
           link: productData.link,
@@ -107,7 +101,6 @@ const GenerateScreen = () => {
           count: item.count,
         };
       });
-
       setRandomItems(itemObjects);
     } else {
       alert('Please log in to generate items based on your nutritional goals.');
@@ -117,33 +110,30 @@ const GenerateScreen = () => {
   return (
     <SafeAreaView style={styles.container}>
         <IconButton
-                icon="cog"
-                size={20}
-                style={styles.gearIcon}
-                color="white"
-                onPress={() => {
-                    console.log('IconButton pressed');
-                    setShowMenu(true)
-                }}
-            />
+          icon="cog"
+          size={20}
+          style={styles.gearIcon}
+          color="white"
+          onPress={() => {
+              console.log('IconButton pressed');
+              setShowMenu(true)
+          }}
+        />
         <Menu />
         <Picker
-        selectedValue={selectedLabel}
-        onValueChange={(itemValue) => handleSelectionChange(itemValue)}
-        itemStyle={{color: "white", fontSize:17, top:-30 }}
-      >
-        <Picker.Item label="Hannaford" value="HannafordData" />
-        <Picker.Item label="Trader Joe's" value="TraderJoesData" />
-      </Picker>
-
-
+          selectedValue={selectedLabel}
+          onValueChange={(itemValue) => handleSelectionChange(itemValue)}
+          itemStyle={{color: "white", fontSize:17, top:-30 }}
+        >
+          <Picker.Item label="Hannaford" value="HannafordData" />
+          <Picker.Item label="Trader Joe's" value="TraderJoesData" />
+        </Picker>
         <View style={styles.buttonContainer}>
-        <TouchableOpacity style={styles.generateButton} onPress={handleGenerate}>
-            <Text style={styles.generateButtonText}>Generate</Text>
-        </TouchableOpacity>
+          <TouchableOpacity style={styles.generateButton} onPress={handleGenerate}>
+              <Text style={styles.generateButtonText}>Generate</Text>
+          </TouchableOpacity>
         </View>
       <ScrollView contentContainerStyle={styles.scrollViewContent}>
-        {/* Adapt UI components for React Native */}
         {randomItems.map((item, index) => (
           <TouchableOpacity key={index} style={styles.item} onPress={() => setItemModalOpen(true)}>
             <Text style={styles.itemText}>{item.name}</Text>
@@ -158,7 +148,6 @@ const GenerateScreen = () => {
           setItemModalOpen(!isItemModalOpen);
         }}
       >
-        {/* Modal Content */}
       </Modal>
       </SafeAreaView>
   );
@@ -166,38 +155,38 @@ const GenerateScreen = () => {
 
 // Define styles
 const styles = StyleSheet.create({
-    generateButton: {
-        backgroundColor: '#0066cc',
-        padding: 10,
-        marginTop: -80,
-        borderRadius: 5,
-        width: '50%',
-      },
-    generateButtonText: {
-        color: '#ffffff',
-        textAlign: 'center',
-      },
-      buttonContainer: { // Adjust button width as needed
-        borderRadius: 5,
-        justifyContent: 'center',
-        alignItems: 'center',
-        marginTop: 20,
-      },
+  generateButton: {
+    backgroundColor: '#0066cc',
+    padding: 10,
+    marginTop: -80,
+    borderRadius: 5,
+    width: '50%',
+  },
+  generateButtonText: {
+    color: '#ffffff',
+    textAlign: 'center',
+  },
+  buttonContainer: { 
+    borderRadius: 5,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: 20,
+  },
   container: {
     flex: 1,
-    backgroundColor: '#121212', // Dark mode background color
+    backgroundColor: '#121212',
   },
   scrollViewContent: {
     padding: 10,
   },
   item: {
-    backgroundColor: '#1e1e1e', // Darker element background for contrast
+    backgroundColor: '#1e1e1e',
     padding: 20,
     marginVertical: 8,
     borderRadius: 5,
   },
   itemText: {
-    color: '#ffffff', // Text color for dark mode
+    color: '#ffffff',
   },
   centeredView: {
     flex: 1,
@@ -210,8 +199,27 @@ const styles = StyleSheet.create({
   gearIcon: {
     right: -330,
     top: -10,
-},
-  // Additional styles...
+  },
+  menuOverlay: {
+    flex: 1,
+    justifyContent: 'flex-start',
+    alignItems: 'flex-end',
+  },
+  menuContainer: {
+    marginTop: 150, 
+    marginRight: 10,
+    backgroundColor: 'white',
+    borderRadius: 5,
+    overflow: 'hidden',
+  },
+  menuItem: {
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    width: 200,
+  },
+  menuItemText: {
+    fontSize: 16,
+  },
 });
 
 export default GenerateScreen;

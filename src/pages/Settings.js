@@ -54,6 +54,7 @@ const Settings = () => {
       <Text style={styles.title}>Whats new, {username}? </Text>
       <Text style={styles.inputLabel}>Age</Text>
     <TextInput
+      placeholderTextColor="#555"
       style={styles.input}
       placeholder={currentUser ? currentUser.age.toString() : ''} // Convert age to string
       value={age}
@@ -63,6 +64,7 @@ const Settings = () => {
 
     <Text style={styles.inputLabel}>Height (cm)</Text>
     <TextInput
+      placeholderTextColor="#555"
       style={styles.input}
       placeholder={currentUser ? currentUser.height.toString() : ''}
       value={height}
@@ -75,6 +77,7 @@ const Settings = () => {
     <View style={styles.weightInput}>
       <Text style={styles.inputLabel}>lbs</Text>
       <TextInput
+        placeholderTextColor="#555"
         style={styles.input}
         placeholder={currentUser ? currentUser.weight.toString() : ''}
         value={weightLbs}
@@ -85,6 +88,7 @@ const Settings = () => {
     <View style={styles.weightInput}>
       <Text style={styles.inputLabel}>kg</Text>
       <TextInput
+        placeholderTextColor="#555"
         style={styles.input}
         placeholder={currentUser ? (currentUser.weight * 0.453592).toFixed(2) : ''}
         value={weightKg}
@@ -95,25 +99,24 @@ const Settings = () => {
   </View>
 
     <TouchableOpacity style={styles.input} onPress={toggleGoalModal}>
-      <Text>{goal || (currentUser ? currentUser.goal : '')}</Text>
+      <Text style={styles.modalText}>{goal || (currentUser ? currentUser.goal : '')}</Text>
     </TouchableOpacity>
 
     <Modal visible={goalModalVisible} transparent={true} animationType="slide">
       <View style={styles.modalContainer}>
-        <TouchableOpacity style={styles.modalBackground} onPress={toggleGoalModal} />
-        <View style={styles.modalContent}>
-          <TouchableOpacity style={styles.modalItem} onPress={() => { setGoal('Gain Weight'); toggleGoalModal(); }}>
-            <Text>Gain Weight</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.modalItem} onPress={() => { setGoal('Lose Weight'); toggleGoalModal(); }}>
-            <Text>Lose Weight</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.modalItem} onPress={() => { setGoal('Maintain Weight'); toggleGoalModal(); }}>
-            <Text>Maintain Weight</Text>
-          </TouchableOpacity>
-        </View>
+        <TouchableOpacity style={styles.modalText} onPress={toggleGoalModal} />
+        <TouchableOpacity style={styles.modalItem} onPress={() => { setGoal('Gain Weight'); toggleGoalModal(); }}>
+          <Text style={styles.modalText}>Gain Weight</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.modalItem} onPress={() => { setGoal('Lose Weight'); toggleGoalModal(); }}>
+          <Text style={styles.modalText}>Lose Weight</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.modalItem} onPress={() => { setGoal('Maintain Weight'); toggleGoalModal(); }}>
+          <Text style={styles.modalText}>Maintain Weight</Text>
+        </TouchableOpacity>
       </View>
     </Modal>
+
 
     <Button title="Save" onPress={handleSave} />
   </View>
@@ -125,6 +128,8 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+    backgroundColor: '#121212', // Dark background color
+    color: '#ffffff', // Light text color
   },
   title: {
     paddingBottom: 150,
@@ -132,17 +137,19 @@ const styles = StyleSheet.create({
     fontFamily: 'AvenirNextCondensed-Heavy',
     fontSize: 40,
     marginBottom: 20,
+    color: '#ffffff', // Light text color
   },  
   input: {
     height: 40,
     width: '80%',
-    borderColor: 'gray',
+    borderColor: '#ffffff', // Light border color
     borderRadius: 8,
     borderWidth: 1,
     marginBottom: 20,
     paddingHorizontal: 10,
     justifyContent: 'center',
     textAlign: 'center', // Center text horizontally
+    backgroundColor: '#333333', // Dark background color
   },
   weightContainer: {
     flexDirection: 'row', // Display children side by side
@@ -152,7 +159,7 @@ const styles = StyleSheet.create({
     borderRadius: 20, // Added borderRadius
     paddingHorizontal: 10, // Added paddingHorizontal for spacing
     paddingVertical: 10, // Added paddingVertical for spacing
-    backgroundColor: '#ffffff',
+    backgroundColor: '#333333', // Dark background color
     marginBottom: 20,
   },
   weightInput: {
@@ -163,30 +170,29 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-  },
-  modalBackground: {
-    position: 'absolute',
-    top: 0,
-    bottom: 0,
-    left: 0,
-    right: 0,
-    backgroundColor: 'rgba(0,0,0,0.5)',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)', // Semi-transparent dark background
   },
   modalContent: {
-    backgroundColor: '#fff',
+    backgroundColor: '#333333', // Dark background color
     padding: 20,
     borderRadius: 10,
   },
   modalItem: {
     paddingVertical: 10,
     borderBottomWidth: 1,
-    borderBottomColor: '#ccc',
+    borderBottomColor: '#cccccc', // Light border color
   },
   inputLabel: {
     marginBottom: 5,
-    color: 'black', // Set the color of the label text
+    color: '#ffffff', // Light text color
     fontSize: 14, // Adjust the font size of the label text
   },
+  modalText: {
+    color: '#555', // Set text color to #555
+    justifyContent: 'center',
+    textAlign: 'center',
+  },  
 });
+
 
 export default Settings;
