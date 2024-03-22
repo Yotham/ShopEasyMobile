@@ -17,6 +17,7 @@ const GenerateScreen = () => {
   const [isLoading, setIsLoading] = useState(true);
   const { currentUser } = useAuth();
   const [showMenu, setShowMenu] = useState(false);
+  const [selectedItem, setSelectedItem] = useState(null); // Initialize selectedItem state as null
   const navigation = useNavigation();
   const isMounted = useRef(true);
 
@@ -109,49 +110,77 @@ const GenerateScreen = () => {
 
   return (
     <SafeAreaView style={styles.container}>
-        <IconButton
-          icon="cog"
-          size={20}
-          style={styles.gearIcon}
-          color="white"
-          onPress={() => {
-              console.log('IconButton pressed');
-              setShowMenu(true)
-          }}
-        />
-        <Menu />
-        <Picker
-          selectedValue={selectedLabel}
-          onValueChange={(itemValue) => handleSelectionChange(itemValue)}
-          itemStyle={{color: "white", fontSize:17, top:-30 }}
-        >
-          <Picker.Item label="Hannaford" value="HannafordData" />
-          <Picker.Item label="Trader Joe's" value="TraderJoesData" />
-        </Picker>
-        <View style={styles.buttonContainer}>
-          <TouchableOpacity style={styles.generateButton} onPress={handleGenerate}>
-              <Text style={styles.generateButtonText}>Generate</Text>
-          </TouchableOpacity>
-        </View>
+      <IconButton
+        icon="cog"
+        size={20}
+        style={styles.gearIcon}
+        color="white"
+        onPress={() => {
+          console.log('IconButton pressed');
+          setShowMenu(true)
+        }}
+      />
+      <Menu />
+      <Picker
+        selectedValue={selectedLabel}
+        onValueChange={(itemValue) => handleSelectionChange(itemValue)}
+        itemStyle={{color: "white", fontSize:17, top:-30 }}
+      >
+        <Picker.Item label="Hannaford" value="HannafordData" />
+        <Picker.Item label="Trader Joe's" value="TraderJoesData" />
+      </Picker>
+      <View style={styles.buttonContainer}>
+        <TouchableOpacity style={styles.generateButton} onPress={handleGenerate}>
+          <Text style={styles.generateButtonText}>Generate</Text>
+        </TouchableOpacity>
+      </View>
       <ScrollView contentContainerStyle={styles.scrollViewContent}>
         {randomItems.map((item, index) => (
-          <TouchableOpacity key={index} style={styles.item} onPress={() => setItemModalOpen(true)}>
+          <TouchableOpacity
+            key={index}
+            style={styles.item}
+            onPress={() => {
+              setSelectedItem(randomItems[index]); // Update selectedItem state with the details of the selected item
+              setItemModalOpen(true);
+            }}
+          >
             <Text style={styles.itemText}>{item.name}</Text>
           </TouchableOpacity>
         ))}
       </ScrollView>
-      <Modal
-        animationType="slide"
-        transparent={true}
-        visible={isItemModalOpen}
-        onRequestClose={() => {
-          setItemModalOpen(!isItemModalOpen);
-        }}
-      >
-      </Modal>
-      </SafeAreaView>
+      {isItemModalOpen && (
+        <TouchableOpacity
+          style={styles.overlay}
+          onPress={() => setItemModalOpen(false)} // Close the modal when clicking on the overlay
+        >
+          <Modal
+            animationType="slide"
+            transparent={true}
+            visible={isItemModalOpen}
+            onRequestClose={() => {
+              setItemModalOpen(false);
+            }}
+          >
+            <View style={styles.modalContainer}>
+              <Text style={styles.modalTitle}>Item Details</Text>
+              <Text style={styles.modalText}>Name: {selectedItem && selectedItem.name}</Text>
+              <Text style={styles.modalText}>Serving Size: {selectedItem && selectedItem.servingSize}</Text>
+              <Text style={styles.modalText}>Number of Servings: {selectedItem && selectedItem.numServings}</Text>
+              <Text style={styles.modalText}>Calories Per Serving: {selectedItem && selectedItem.caloriesPS}</Text>
+              {/* Add more details as needed */}
+              <TouchableOpacity
+                style={styles.closeButton}
+                onPress={() => setItemModalOpen(false)}
+              >
+                <Text style={styles.closeButtonText}>Close</Text>
+              </TouchableOpacity>
+            </View>
+          </Modal>
+        </TouchableOpacity>
+      )}
+    </SafeAreaView>
   );
-};
+}  
 
 // Define styles
 const styles = StyleSheet.create({
@@ -219,6 +248,43 @@ const styles = StyleSheet.create({
   },
   menuItemText: {
     fontSize: 16,
+  },
+
+  modalContainer: {
+    backgroundColor: 'gray',
+    marginTop: '50%',
+    marginLeft: '10%',
+    padding: 20,
+    borderRadius: 10,
+    width: '80%',
+  },
+
+  modalTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    textAlign: 'center',
+    marginBottom: 10,
+    color: 'white',
+  },
+
+  modalText: {
+    fontSize: 16,
+    color: 'white',
+    marginBottom: 5,
+  },
+
+  closeButton: {
+    backgroundColor: 'black',
+    padding: 10,
+    borderRadius: 5,
+    alignSelf: 'center',
+    marginTop: 20,
+  },
+
+  closeButtonText: {
+    fontSize: 16,
+    color: 'white',
+    textAlign: 'center',
   },
 });
 
