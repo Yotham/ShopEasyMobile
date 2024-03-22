@@ -13,6 +13,8 @@ const Settings = () => {
   const [height, setHeight] = useState('');
   const [weightLbs, setWeightLbs] = useState('');
   const [weightKg, setWeightKg] = useState('');
+  const [heightft, setHeightft] = useState('');
+  const [heightcm, setHeightcm] = useState('');
   const [genderModalVisible, setGenderModalVisible] = useState(false);
   const [goalModalVisible, setGoalModalVisible] = useState(false);
   const [goal, setGoal] = useState('');
@@ -49,6 +51,27 @@ const Settings = () => {
   };
 
 
+  
+
+  const ftTocm = (ft) => {
+    return (ft / 0.0328084).toFixed(2); // 1 pound is approximately 0.453592 kilograms
+  };
+
+  const cmToft = (cm) => {
+    return (cm * 0.0328084).toFixed(2); // 1 kilogram is approximately 2.20462 pounds
+  };
+
+  const handleHeightftChange = (text) => {
+    setHeightft(text);
+    setHeightcm(ftTocm(parseFloat(text)).toString());
+  };
+
+  const handleHeightcmChange = (text) => {
+    setHeightcm(text);
+    setHeightft(cmToft(parseFloat(text)).toString());
+  };
+
+
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Whats new, {username}? </Text>
@@ -62,15 +85,31 @@ const Settings = () => {
       keyboardType="numeric"
     />
 
-    <Text style={styles.inputLabel}>Height (cm)</Text>
-    <TextInput
-      placeholderTextColor="#555"
-      style={styles.input}
-      placeholder={currentUser ? currentUser.height.toString() : ''}
-      value={height}
-      onChangeText={setHeight}
-      keyboardType="numeric"
-    />
+<Text style={styles.inputLabel}>Height</Text>
+<View style={styles.weightContainer}>
+    <View style={styles.weightInput}>
+      <Text style={styles.inputLabel}>feet</Text>
+      <TextInput
+        placeholderTextColor="#555"
+        style={styles.input}
+        placeholder={currentUser ? (currentUser.height * 0.0328084).toFixed(2) : ''}
+        value={heightft}
+        onChangeText={handleHeightftChange}
+        keyboardType="numeric"
+      />
+    </View>
+    <View style={styles.weightInput}>
+      <Text style={styles.inputLabel}>cm</Text>
+      <TextInput
+        placeholderTextColor="#555"
+        style={styles.input}
+        placeholder={currentUser ? (currentUser.height).toFixed(2) : ''}
+        value={heightcm}
+        onChangeText={handleHeightcmChange}
+        keyboardType="numeric"
+      />
+    </View>
+  </View>
 
 <Text style={styles.inputLabel}>Weight</Text>
 <View style={styles.weightContainer}>
