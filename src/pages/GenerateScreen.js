@@ -17,9 +17,19 @@ const GenerateScreen = () => {
   const [isLoading, setIsLoading] = useState(true);
   const { currentUser } = useAuth();
   const [showMenu, setShowMenu] = useState(false);
+  const { handleLogout, setCurrentUser } = useAuth();
   const [selectedItem, setSelectedItem] = useState(null); // Initialize selectedItem state as null
   const navigation = useNavigation();
+  const [showAverages, setShowAverages] = useState(false);
+  const [generatePressed, setGeneratePressed] = useState(false);
   const isMounted = useRef(true);
+
+  const [dailyAverages, setDailyAverages] = useState({
+    calories: 0,
+    protein: 0,
+    fats: 0,
+    carbs: 0,
+  });
 
   useEffect(() => {
     const timer = setTimeout(() => {setIsLoading(false);}, 500);
@@ -28,6 +38,31 @@ const GenerateScreen = () => {
     isMounted.current = false;
     }
   }, []);
+
+  useEffect(() => {
+    if (generatePressed && randomItems.length > 0) {
+      const totals = randomItems.reduce(
+        (acc, item) => {
+          acc.calories += item.caloriesPS;
+          acc.protein += item.ProteinPS;
+          acc.fats += item.FatPS;
+          acc.carbs += item.CarbPS;
+          return acc;
+        },
+        { calories: 0, protein: 0, fats: 0, carbs: 0 }
+      );
+  
+      setDailyAverages({
+        calories: totals.calories / 7,
+        protein: totals.protein / 7,
+        fats: totals.fats / 7,
+        carbs: totals.carbs / 7,
+      });
+  
+      setShowAverages(true); // Ensure this is set to show the averages
+    }
+  }, [randomItems, generatePressed]); // Depend on randomItems and generatePressed
+  
 
   if (isLoading) {
     return (
@@ -86,6 +121,7 @@ const GenerateScreen = () => {
     );
 
   const handleGenerate = () => {
+    setGeneratePressed(true);
     if (currentUser && currentUser.caloricGoal) {
       const items = getRandomItems(selectedData, currentUser.caloricGoal);
       const itemObjects = items.map(item => {
@@ -106,6 +142,26 @@ const GenerateScreen = () => {
     } else {
       alert('Please log in to generate items based on your nutritional goals.');
     }
+
+    const totals = randomItems.reduce(
+      (acc, item) => {
+        acc.calories += item.caloriesPS;
+        acc.protein += item.ProteinPS;
+        acc.fats += item.FatPS;
+        acc.carbs += item.CarbPS;
+        return acc;
+      },
+      { calories: 0, protein: 0, fats: 0, carbs: 0 }
+    );
+  
+    setDailyAverages({
+      calories: totals.calories / 7,
+      protein: totals.protein / 7,
+      fats: totals.fats / 7,
+      carbs: totals.carbs / 7,
+    });
+  
+    setShowAverages(true);
   };
 
   return (
@@ -134,6 +190,20 @@ const GenerateScreen = () => {
           <Text style={styles.generateButtonText}>Generate</Text>
         </TouchableOpacity>
       </View>
+      
+      {showAverages && (
+        <View style={styles.averagesContainer}>
+          <Text style={styles.averagesDetail}>Daily Averages:</Text>
+          <View style={{flexDirection: 'row', justifyContent: 'space-evenly'}}>
+            <Text style={styles.averagesDetail}>Calories: <Text style={styles.boldText}>{dailyAverages.calories.toFixed(2)}</Text></Text>
+            <Text style={styles.averagesDetail}>Protein: <Text style={styles.boldText}>{dailyAverages.protein.toFixed(2)}g</Text></Text>
+            <Text style={styles.averagesDetail}>Fats: <Text style={styles.boldText}>{dailyAverages.fats.toFixed(2)}g</Text></Text>
+            <Text style={styles.averagesDetail}>Carbs: <Text style={styles.boldText}>{dailyAverages.carbs.toFixed(2)}g</Text></Text>
+          </View>
+        </View>
+      )}
+
+
       <ScrollView contentContainerStyle={styles.scrollViewContent}>
         {randomItems.map((item, index) => (
           <TouchableOpacity
@@ -162,12 +232,13 @@ const GenerateScreen = () => {
             }}
           >
             <View style={styles.modalContainer}>
-              <Text style={styles.modalTitle}>Item Details</Text>
-              <Text style={styles.modalText}>Name: {selectedItem && selectedItem.name}</Text>
-              <Text style={styles.modalText}>Serving Size: {selectedItem && selectedItem.servingSize}</Text>
-              <Text style={styles.modalText}>Number of Servings: {selectedItem && selectedItem.numServings}</Text>
-              <Text style={styles.modalText}>Calories Per Serving: {selectedItem && selectedItem.caloriesPS}</Text>
-              {/* Add more details as needed */}
+            <Text style={styles.modalTitle}>{selectedItem && selectedItem.name}</Text>
+            <Text style={styles.modalText}>Serving Size: <Text style={{fontWeight: 'bold'}}>{selectedItem && selectedItem.servingSize}</Text></Text>
+            <Text style={styles.modalText}>Number of Servings: <Text style={{fontWeight: 'bold'}}>{selectedItem && Math.round(selectedItem.numServings)}</Text></Text>
+            <Text style={styles.modalText}>Calories Per Serving: <Text style={{fontWeight: 'bold'}}>{selectedItem && selectedItem.caloriesPS}</Text></Text>
+            <Text style={styles.modalText}>Protein Per Serving: <Text style={{fontWeight: 'bold'}}>{selectedItem && selectedItem.ProteinPS} g</Text></Text>
+            <Text style={styles.modalText}>Fat Per Serving: <Text style={{fontWeight: 'bold'}}>{selectedItem && selectedItem.FatPS} g</Text></Text>
+            <Text style={styles.modalText}>Carbs Per Serving: <Text style={{fontWeight: 'bold'}}>{selectedItem && selectedItem.CarbPS} g</Text></Text>
               <TouchableOpacity
                 style={styles.closeButton}
                 onPress={() => setItemModalOpen(false)}
@@ -185,7 +256,7 @@ const GenerateScreen = () => {
 // Define styles
 const styles = StyleSheet.create({
   generateButton: {
-    backgroundColor: '#0066cc',
+    backgroundColor: '#2272FF',
     padding: 10,
     marginTop: -80,
     borderRadius: 5,
@@ -251,7 +322,7 @@ const styles = StyleSheet.create({
   },
 
   modalContainer: {
-    backgroundColor: 'gray',
+    backgroundColor: '#2272FF',
     marginTop: '50%',
     marginLeft: '10%',
     padding: 20,
@@ -285,6 +356,27 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: 'white',
     textAlign: 'center',
+  },
+
+  averagesContainer: {
+    flexDirection: 'row',
+    flexWrap: 'wrap', 
+    justifyContent: 'space-evenly', 
+    alignItems: 'center', 
+    marginTop: 10, 
+  },
+  averagesDetail: {
+    color: '#ffffff',
+    fontSize: 16,
+    margin: 5,
+  },
+  averagesDetail: {
+    color: '#ffffff',
+    fontSize: 12,
+    marginHorizontal: 5, 
+  },
+  boldText: {
+    fontWeight: 'bold',
   },
 });
 

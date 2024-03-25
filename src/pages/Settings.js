@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, Button, StyleSheet, Modal, TouchableOpacity } from 'react-native';
+import { View, Text, TextInput, Button, StyleSheet, Modal, TouchableOpacity, ScrollView, KeyboardAvoidingView, Platform, TouchableWithoutFeedback, Keyboard } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { useAuth } from '../context/AuthContext';
 
@@ -73,92 +73,104 @@ const Settings = () => {
 
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Whats new, {username}? </Text>
-      <Text style={styles.inputLabel}>Age</Text>
-    <TextInput
-      placeholderTextColor="#555"
-      style={styles.input}
-      placeholder={currentUser ? currentUser.age.toString() : ''} // Convert age to string
-      value={age}
-      onChangeText={setAge}
-      keyboardType="numeric"
-    />
+    <KeyboardAvoidingView 
+      behavior={Platform.OS === "ios" ? "padding" : "height"} 
+      style={{flex: 1}}
+    >
+      <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+        <ScrollView contentContainerStyle={styles.container}>
+          <View style={{alignItems: 'center'}}>
+          <View style={styles.container}>
+            <Text style={styles.title}>Whats new, {username}? </Text>
+            <Text style={styles.inputLabel}>Age</Text>
+          <TextInput
+            placeholderTextColor="#555"
+            style={styles.input}
+            placeholder={currentUser ? currentUser.age.toString() : ''} // Convert age to string
+            value={age}
+            onChangeText={setAge}
+            keyboardType="numeric"
+          />
 
-<Text style={styles.inputLabel}>Height</Text>
-<View style={styles.weightContainer}>
-    <View style={styles.weightInput}>
-      <Text style={styles.inputLabel}>feet</Text>
-      <TextInput
-        placeholderTextColor="#555"
-        style={styles.input}
-        placeholder={currentUser ? (currentUser.height * 0.0328084).toFixed(2) : ''}
-        value={heightft}
-        onChangeText={handleHeightftChange}
-        keyboardType="numeric"
-      />
-    </View>
-    <View style={styles.weightInput}>
-      <Text style={styles.inputLabel}>cm</Text>
-      <TextInput
-        placeholderTextColor="#555"
-        style={styles.input}
-        placeholder={currentUser ? (currentUser.height).toFixed(2) : ''}
-        value={heightcm}
-        onChangeText={handleHeightcmChange}
-        keyboardType="numeric"
-      />
-    </View>
-  </View>
+          <Text style={styles.inputLabel}>Height</Text>
+          <View style={styles.weightContainer}>
+            <View style={styles.weightInput}>
+              <Text style={styles.inputLabel}>feet</Text>
+              <TextInput
+                placeholderTextColor="#555"
+                style={styles.input}
+                placeholder={currentUser ? (currentUser.height * 0.0328084).toFixed(2) : ''}
+                value={heightft}
+                onChangeText={handleHeightftChange}
+                keyboardType="numeric"
+              />
+            </View>
+            <View style={styles.weightInput}>
+              <Text style={styles.inputLabel}>cm</Text>
+              <TextInput
+                placeholderTextColor="#555"
+                style={styles.input}
+                placeholder={currentUser ? (currentUser.height).toFixed(2) : ''}
+                value={heightcm}
+                onChangeText={handleHeightcmChange}
+                keyboardType="numeric"
+              />
+            </View>
+          </View>
 
-<Text style={styles.inputLabel}>Weight</Text>
-<View style={styles.weightContainer}>
-    <View style={styles.weightInput}>
-      <Text style={styles.inputLabel}>lbs</Text>
-      <TextInput
-        placeholderTextColor="#555"
-        style={styles.input}
-        placeholder={currentUser ? currentUser.weight.toString() : ''}
-        value={weightLbs}
-        onChangeText={handleWeightLbsChange}
-        keyboardType="numeric"
-      />
-    </View>
-    <View style={styles.weightInput}>
-      <Text style={styles.inputLabel}>kg</Text>
-      <TextInput
-        placeholderTextColor="#555"
-        style={styles.input}
-        placeholder={currentUser ? (currentUser.weight * 0.453592).toFixed(2) : ''}
-        value={weightKg}
-        onChangeText={handleWeightKgChange}
-        keyboardType="numeric"
-      />
-    </View>
-  </View>
+          <Text style={styles.inputLabel}>Weight</Text>
+          <View style={styles.weightContainer}>
+            <View style={styles.weightInput}>
+              <Text style={styles.inputLabel}>lbs</Text>
+              <TextInput
+                placeholderTextColor="#555"
+                style={styles.input}
+                placeholder={currentUser ? currentUser.weight.toString() : ''}
+                value={weightLbs}
+                onChangeText={handleWeightLbsChange}
+                keyboardType="numeric"
+              />
+            </View>
+            <View style={styles.weightInput}>
+              <Text style={styles.inputLabel}>kg</Text>
+              <TextInput
+                placeholderTextColor="#555"
+                style={styles.input}
+                placeholder={currentUser ? (currentUser.weight * 0.453592).toFixed(2) : ''}
+                value={weightKg}
+                onChangeText={handleWeightKgChange}
+                keyboardType="numeric"
+              />
+            </View>
+          </View>
 
-    <TouchableOpacity style={styles.input} onPress={toggleGoalModal}>
-      <Text style={styles.modalText}>{goal || (currentUser ? currentUser.goal : '')}</Text>
-    </TouchableOpacity>
+          <TouchableOpacity style={styles.input} onPress={toggleGoalModal}>
+            <Text style={styles.modalText}>{goal || (currentUser ? currentUser.goal : '')}</Text>
+          </TouchableOpacity>
 
-    <Modal visible={goalModalVisible} transparent={true} animationType="slide">
-      <View style={styles.modalContainer}>
-        <TouchableOpacity style={styles.modalText} onPress={toggleGoalModal} />
-        <TouchableOpacity style={styles.modalItem} onPress={() => { setGoal('Gain Weight'); toggleGoalModal(); }}>
-          <Text style={styles.modalText}>Gain Weight</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.modalItem} onPress={() => { setGoal('Lose Weight'); toggleGoalModal(); }}>
-          <Text style={styles.modalText}>Lose Weight</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.modalItem} onPress={() => { setGoal('Maintain Weight'); toggleGoalModal(); }}>
-          <Text style={styles.modalText}>Maintain Weight</Text>
-        </TouchableOpacity>
-      </View>
-    </Modal>
+          <Modal visible={goalModalVisible} transparent={true} animationType="slide">
+            <View style={styles.modalContainer}>
+              <TouchableOpacity style={styles.modalText} onPress={toggleGoalModal} />
+              <TouchableOpacity style={styles.modalItem} onPress={() => { setGoal('Gain Weight'); toggleGoalModal(); }}>
+                <Text style={styles.modalText}>Gain Weight</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.modalItem} onPress={() => { setGoal('Lose Weight'); toggleGoalModal(); }}>
+                <Text style={styles.modalText}>Lose Weight</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.modalItem} onPress={() => { setGoal('Maintain Weight'); toggleGoalModal(); }}>
+                <Text style={styles.modalText}>Maintain Weight</Text>
+              </TouchableOpacity>
+            </View>
+          </Modal>
 
 
-    <Button title="Save" onPress={handleSave} />
-  </View>
+          <Button title="Save" onPress={handleSave} />
+          </View>
+          </View>
+        </ScrollView>
+      </TouchableWithoutFeedback>
+    </KeyboardAvoidingView>
+    
   );
 };
 
@@ -175,7 +187,6 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-start',
     fontFamily: 'AvenirNextCondensed-Heavy',
     fontSize: 40,
-    marginBottom: 20,
     color: '#ffffff', // Light text color
   },  
   input: {
@@ -189,6 +200,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     textAlign: 'center', // Center text horizontally
     backgroundColor: '#333333', // Dark background color
+    color: 'white'
   },
   weightContainer: {
     flexDirection: 'row', // Display children side by side
