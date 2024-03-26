@@ -23,6 +23,8 @@ const GenerateScreen = () => {
   const [showAverages, setShowAverages] = useState(false);
   const [generatePressed, setGeneratePressed] = useState(false);
   const isMounted = useRef(true);
+  const [viewMode, setViewMode] = useState('meals'); // 'meals' or 'weeklyPlan'
+  const [weeklyPlan, setWeeklyPlan] = useState([]);
 
   const [dailyAverages, setDailyAverages] = useState({
     calories: 0,
@@ -63,6 +65,12 @@ const GenerateScreen = () => {
     }
   }, [randomItems, generatePressed]); // Depend on randomItems and generatePressed
   
+  useEffect(() => {
+    if (viewMode === 'weeklyPlan' && randomItems.length > 0) {
+      const plan = distributeMealsWeekly(randomItems);
+      setWeeklyPlan(plan);
+    }
+  }, [randomItems, viewMode]);  
 
   if (isLoading) {
     return (
@@ -124,6 +132,8 @@ const GenerateScreen = () => {
     setGeneratePressed(true);
     if (currentUser && currentUser.caloricGoal) {
       const items = getRandomItems(selectedData, currentUser.caloricGoal);
+      const totalCalories = items.reduce((acc, item) => acc + item.caloriesForAllServings * item.count, 0);
+      console.log(`Total Calories: ${totalCalories}`);
       const itemObjects = items.map(item => {
         const productData = selectedData[item.pageNumber][item.name];
         return {
@@ -164,6 +174,28 @@ const GenerateScreen = () => {
     setShowAverages(true);
   };
 
+  const distributeMealsWeekly = (items) => {
+    const totalCalories = items.reduce((acc, item) => acc + (item.caloriesPS * item.numServings * item.count), 0);
+    const targetDailyCalories = totalCalories / 7;
+  
+    let days = Array(7).fill(null).map(() => ({ meals: [], totalCalories: 0 }));
+  
+    const sortedItems = items.sort((a, b) => (b.caloriesPS * b.numServings * b.count) - (a.caloriesPS * a.numServings * a.count));
+  
+    sortedItems.forEach(item => {
+      let day = days.reduce((prev, current) => (prev.totalCalories < current.totalCalories) ? prev : current);
+      day.meals.push(item);
+      day.totalCalories += (item.caloriesPS * item.numServings * item.count);
+    });
+    return days.map(day => ({
+      breakfast: day.meals[0] || null,
+      lunch: day.meals[1] || null,
+      dinner: day.meals[2] || null,
+      totalCalories: day.totalCalories
+    }));
+  };
+  
+
   return (
     <SafeAreaView style={styles.container}>
       <IconButton
@@ -180,7 +212,7 @@ const GenerateScreen = () => {
       <Picker
         selectedValue={selectedLabel}
         onValueChange={(itemValue) => handleSelectionChange(itemValue)}
-        itemStyle={{color: "white", fontSize:17, top:-30 }}
+        itemStyle={{color: "white", fontSize:17, top:-30, height: 150 }}
       >
         <Picker.Item label="Hannaford" value="HannafordData" />
         <Picker.Item label="Trader Joe's" value="TraderJoesData" />
@@ -203,21 +235,64 @@ const GenerateScreen = () => {
         </View>
       )}
 
-
-      <ScrollView contentContainerStyle={styles.scrollViewContent}>
-        {randomItems.map((item, index) => (
+      {generatePressed && (
+        <View style={styles.viewModeContainer}>
           <TouchableOpacity
-            key={index}
-            style={styles.item}
-            onPress={() => {
-              setSelectedItem(randomItems[index]); // Update selectedItem state with the details of the selected item
-              setItemModalOpen(true);
-            }}
-          >
-            <Text style={styles.itemText}>{item.name}</Text>
+            style={[styles.viewModeButton, viewMode === 'meals' ? styles.selectedButton : {}]}
+            onPress={() => setViewMode('meals')}>
+            <Text style={styles.viewModeButtonText}>Meals for the Week</Text>
           </TouchableOpacity>
-        ))}
-      </ScrollView>
+          <TouchableOpacity
+            style={[styles.viewModeButton, viewMode === 'weeklyPlan' ? styles.selectedButton : {}]}
+            onPress={() => setViewMode('weeklyPlan')}>
+            <Text style={styles.viewModeButtonText}>Weekly Plan</Text>
+          </TouchableOpacity>
+        </View>
+      )}
+
+      {viewMode === 'meals' && (
+        <ScrollView contentContainerStyle={styles.scrollViewContent}>
+          {randomItems.map((item, index) => (
+            <TouchableOpacity
+              key={index}
+              style={styles.item}
+              onPress={() => {
+                setSelectedItem(randomItems[index]);
+                setItemModalOpen(true);
+              }}
+            >
+              <Text style={styles.itemText}>{item.name}</Text>
+            </TouchableOpacity>
+          ))}
+        </ScrollView>
+      )}
+
+      {viewMode === 'weeklyPlan' && (
+        <ScrollView contentContainerStyle={styles.scrollViewContent}>
+          {weeklyPlan.map((day, index) => (
+            <View key={index} style={styles.dayContainer}>
+              <Text style={styles.dayTitle}>Day {index + 1}</Text>
+              {day.breakfast && (
+                <View style={styles.mealItem}>
+                  <Text style={styles.mealItemText}>Breakfast: {day.breakfast.name}</Text>
+                </View>
+              )}
+              {day.lunch && (
+                <View style={styles.mealItem}>
+                  <Text style={styles.mealItemText}>Lunch: {day.lunch.name}</Text>
+                </View>
+              )}
+              {day.dinner && (
+                <View style={styles.mealItem}>
+                  <Text style={styles.mealItemText}>Dinner: {day.dinner.name}</Text>
+                </View>
+              )}
+              <Text style={styles.mealItemText}>Total Calories: {day.totalCalories.toFixed(2)}</Text>
+            </View>
+          ))}
+        </ScrollView>
+      )}
+      
       {isItemModalOpen && (
         <TouchableOpacity
           style={styles.overlay}
@@ -367,17 +442,66 @@ const styles = StyleSheet.create({
   },
   averagesDetail: {
     color: '#ffffff',
-    fontSize: 16,
-    margin: 5,
-  },
-  averagesDetail: {
-    color: '#ffffff',
     fontSize: 12,
-    marginHorizontal: 5, 
+    marginHorizontal: 5,
+  },
+  mealsTitle: {
+    color: '#ffffff',
+    fontSize: 16,
+    marginHorizontal: 5,
+    marginTop: 20
   },
   boldText: {
     fontWeight: 'bold',
   },
+  viewModeContainer: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    marginVertical: 10,
+  },
+  viewModeButton: {
+    marginHorizontal: 10,
+    padding: 10,
+    borderWidth: 1,
+    borderColor: 'white',
+  },
+  selectedButton: {
+    backgroundColor: 'grey',
+  },
+  viewModeButtonText: {
+    color: 'white',
+  },
+  weeklyPlanContainer: {
+    padding: 10,
+    marginTop: 10,
+  },
+  dayContainer: {
+    alignItems: 'center', 
+    backgroundColor: '#2a2e35',
+    padding: 15,
+    borderRadius: 5,
+    marginBottom: 10,
+  },
+  dayTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#ffffff',
+    marginBottom: 5,
+  },
+  
+  mealItem: {
+    alignSelf: 'stretch',
+    backgroundColor: '#3a3e45',
+    padding: 10,
+    borderRadius: 5,
+    marginTop: 5,
+
+  },
+  mealItemText: {
+    color: '#ffffff',
+    fontSize: 16,
+  },
+  
 });
 
 export default GenerateScreen;
