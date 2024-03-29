@@ -1,13 +1,43 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, Button, StyleSheet, Modal, TouchableOpacity, ScrollView, KeyboardAvoidingView, Platform, TouchableWithoutFeedback, Keyboard } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { useAuth } from '../context/AuthContext';
+import * as SecureStore from 'expo-secure-store';
+
+const ip = 'https://shop-ez.netlify.app/';
 
 const Settings = () => {
   const navigation = useNavigation();
 
   const { currentUser } = useAuth();
   const username = currentUser ? currentUser.username : null;
+
+  const [updatedUser, setUpdatedUser] = useState({
+    height: [0, 0],
+    weight: '',
+    gender: '',
+    goal: '',
+    // ... add other fields as needed
+  });
+  const [isLoading, setIsLoading] = useState(true);
+
+  const cmToFeetAndInches = (cm) => {
+      const totalInches = cm / 2.54;
+      const feet = Math.floor(totalInches / 12);
+      const inches = Math.round(totalInches % 12);
+      return [feet, inches];
+
+  };
+  useEffect(() => {
+      if (currentUser) {
+          const [feet, inches] = cmToFeetAndInches(currentUser.height);
+          setUpdatedUser({
+              ...currentUser,
+              height: [feet, inches]
+          });
+          setIsLoading(false);
+      }
+  }, [currentUser]);
 
   const [age, setAge] = useState('');
   const [height, setHeight] = useState('');
@@ -19,9 +49,59 @@ const Settings = () => {
   const [goalModalVisible, setGoalModalVisible] = useState(false);
   const [goal, setGoal] = useState('');
 
-  const handleSave = () => {
-    // Perform save operation here
+  const getToken = async () => {
+    try {
+      const token = await SecureStore.getItemAsync('token');
+      return token;
+    } catch (error) {
+      console.error('Error retrieving token:', error);
+      return null;
+    }
+  };
+
+  const handleSave = async () => {
+    try {
+      const token = await getToken();
+      if (token){
+        const response = await fetch(ip + `/api/user/${currentUser._id}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify(updatedUser)
+        });
+
+        if (!response.ok) {
+            throw new Error('Failed to update user data');
+        }
+
+        const updatedData = await response.json();
+        //setCurrentUser(updatedData);  // Update the local state to reflect the changes
+        alert('Account updated successfully!');
+        // Optionally, redirect the user or perform other actions
+      } else {
+          console.log('Token not found');
+      }
+  } catch (error) {
+      console.error('Error updating user data:', error);
+      alert('An error occurred while updating the account.');
+  }
     console.log('Saved!');
+  };
+
+  const handleChange = (name, value) => {
+    setUpdatedUser(prevState => ({
+      ...prevState,
+      [name]: value
+    }));
+  };
+
+  const handleHeightChange = (type, value) => {
+    const height = [...updatedUser.height];
+    if (type === "feet") height[0] = parseInt(value);
+    else height[1] = parseInt(value);
+    setUpdatedUser(prevState => ({ ...prevState, height }));
   };
 
   const toggleGenderModal = () => {
@@ -50,28 +130,6 @@ const Settings = () => {
     setWeightLbs(kilogramsToPounds(parseFloat(text)).toString());
   };
 
-
-  
-
-  const ftTocm = (ft) => {
-    return (ft / 0.0328084).toFixed(2); // 1 pound is approximately 0.453592 kilograms
-  };
-
-  const cmToft = (cm) => {
-    return (cm * 0.0328084).toFixed(2); // 1 kilogram is approximately 2.20462 pounds
-  };
-
-  const handleHeightftChange = (text) => {
-    setHeightft(text);
-    setHeightcm(ftTocm(parseFloat(text)).toString());
-  };
-
-  const handleHeightcmChange = (text) => {
-    setHeightcm(text);
-    setHeightft(cmToft(parseFloat(text)).toString());
-  };
-
-
   return (
     <KeyboardAvoidingView 
       behavior={Platform.OS === "ios" ? "padding" : "height"} 
@@ -87,8 +145,8 @@ const Settings = () => {
             placeholderTextColor="#555"
             style={styles.input}
             placeholder={currentUser ? currentUser.age.toString() : ''} // Convert age to string
-            value={age}
-            onChangeText={setAge}
+            value={updatedUser.age}
+            onChangeText={value => handleChange('age', value)}
             keyboardType="numeric"
           />
 
@@ -99,46 +157,34 @@ const Settings = () => {
               <TextInput
                 placeholderTextColor="#555"
                 style={styles.input}
-                placeholder={currentUser ? (currentUser.height * 0.0328084).toFixed(2) : ''}
-                value={heightft}
-                onChangeText={handleHeightftChange}
+                placeholder={currentUser ? currentUser.height.toString() : ''}
+                value={updatedUser.height[0]}
+                onChangeText={value => handleHeightChange('feet', value)}
                 keyboardType="numeric"
               />
             </View>
             <View style={styles.weightInput}>
-              <Text style={styles.inputLabel}>cm</Text>
+              <Text style={styles.inputLabel}>inches</Text>
               <TextInput
                 placeholderTextColor="#555"
                 style={styles.input}
-                placeholder={currentUser ? (currentUser.height).toFixed(2) : ''}
-                value={heightcm}
-                onChangeText={handleHeightcmChange}
+                placeholder={currentUser ? (currentUser.height * 0.453592).toFixed(2) : ''}
+                value={updatedUser.height[1]}
+                onChangeText={value => handleHeightChange('inches', value)}
                 keyboardType="numeric"
               />
             </View>
           </View>
 
-          <Text style={styles.inputLabel}>Weight</Text>
+          <Text style={styles.inputLabel}>Weight (lbs)</Text>
           <View style={styles.weightContainer}>
             <View style={styles.weightInput}>
-              <Text style={styles.inputLabel}>lbs</Text>
               <TextInput
                 placeholderTextColor="#555"
                 style={styles.input}
-                placeholder={currentUser ? currentUser.weight.toString() : ''}
-                value={weightLbs}
-                onChangeText={handleWeightLbsChange}
-                keyboardType="numeric"
-              />
-            </View>
-            <View style={styles.weightInput}>
-              <Text style={styles.inputLabel}>kg</Text>
-              <TextInput
-                placeholderTextColor="#555"
-                style={styles.input}
-                placeholder={currentUser ? (currentUser.weight * 0.453592).toFixed(2) : ''}
-                value={weightKg}
-                onChangeText={handleWeightKgChange}
+                placeholder={currentUser && currentUser.weight !== null ? currentUser.weight.toString() : ''}
+                value={updatedUser.weigh}
+                onChangeText ={value => handleChange('weight', value)}
                 keyboardType="numeric"
               />
             </View>
