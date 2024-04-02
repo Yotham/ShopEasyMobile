@@ -199,10 +199,10 @@ const GenerateScreen = () => {
   return (
     <SafeAreaView style={styles.container}>
       <IconButton
-        icon="cog"
+        icon="menu"
+        iconColor="white"
         size={20}
-        style={styles.gearIcon}
-        color="white"
+        style={styles.SettingsIcon}
         onPress={() => {
           console.log('IconButton pressed');
           setShowMenu(true)
@@ -212,7 +212,7 @@ const GenerateScreen = () => {
       <Picker
         selectedValue={selectedLabel}
         onValueChange={(itemValue) => handleSelectionChange(itemValue)}
-        itemStyle={{color: "white", fontSize:17, top:-30, height: 150 }}
+        itemStyle={{color: "white", fontSize:17, top:0, height: 150 }}
       >
         <Picker.Item label="Hannaford" value="HannafordData" />
         <Picker.Item label="Trader Joe's" value="TraderJoesData" />
@@ -371,9 +371,9 @@ const styles = StyleSheet.create({
   primaryBg: {
     backgroundColor: '#121212',
   },
-  gearIcon: {
+  SettingsIcon: {
     right: -330,
-    top: -10,
+    top: 10,
   },
   menuOverlay: {
     flex: 1,
