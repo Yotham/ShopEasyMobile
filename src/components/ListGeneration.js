@@ -1,63 +1,86 @@
 export function getRandomItems(data, caloricGoal, minMeals = 10) {
-    caloricGoal *= 7; // Convert to weekly goal
-    let allItems = [];
+    caloricGoal = caloricGoal * 7
+    const allItems = [];
 
-    // Gather all valid items and their nutritional information
-    Object.entries(data).forEach(([pageNumber, items]) => {
-        Object.entries(items).forEach(([name, {Nutrition: nutrition}]) => {
+    for (const pageNumber in data) {
+        const itemNames = Object.keys(data[pageNumber]);
+
+        for (const name of itemNames) {
+            const nutrition = data[pageNumber][name].Nutrition;
+            
             if (Object.keys(nutrition).length > 1 || (Object.keys(nutrition).length === 1 && !("None" in nutrition))) {
-                const caloriesForAllServings = nutrition.numServings * ((nutrition.ProteinPS * 4) + (nutrition.CarbPS * 4) + (nutrition.FatPS * 9));
+                
+                const numServings = nutrition.numServings || 1;
+                const caloriesForAllServings = numServings * (
+                    (nutrition.ProteinPS * 4) +
+                    (nutrition.CarbPS * 4) +
+                    (nutrition.FatPS * 9)
+                );
+
                 if (!isNaN(caloriesForAllServings)) {
-                    allItems.push({ name, pageNumber, caloriesForAllServings, numServings: nutrition.numServings });
+                    allItems.push({ name, pageNumber, caloriesForAllServings, numServings });
                 }
             }
-        });
-    });
+        }
+    }
 
-    // Shuffle allItems to ensure a random selection
-    allItems = allItems.sort(() => 0.5 - Math.random());
+    // Shuffle the items
+    let m = allItems.length, t, i;
+    while (m) {
+        i = Math.floor(Math.random() * m--);
+        t = allItems[m];
+        allItems[m] = allItems[i];
+        allItems[i] = t;
+    }
 
-    // Initial selections
-    let selectedItems = [];
+    // Segment items into lower and higher calorie lists
+    const medianCalories = caloricGoal / minMeals;
+    const lowerCalorieItems = allItems.filter(item => item.caloriesForAllServings <= medianCalories);
+    const higherCalorieItems = allItems.filter(item => item.caloriesForAllServings > medianCalories);
+
+    const selectedItems = [];
     let totalCalories = 0;
 
-    const tryAddItem = (item) => {
-        const newTotal = totalCalories + item.caloriesForAllServings;
-        if (newTotal <= caloricGoal && selectedItems.length < minMeals) {
-            selectedItems.push({ ...item, count: 1 });
-            totalCalories = newTotal;
+    // Function to add item if it fits the calorie goal and meal constraints
+    function addItemIfFits(item) {
+        const potentialCalories = totalCalories + item.caloriesForAllServings;
+        if (potentialCalories <= caloricGoal) {
+            totalCalories = potentialCalories;
             return true;
         }
         return false;
-    };
-
-    allItems.forEach(item => {
-        // Try to add each item; if it doesn't fit, move on
-        tryAddItem(item);
-
-        // Early exit if close to caloric goal
-        if (totalCalories >= caloricGoal) return;
-    });
-
-    // Ensure selectedItems meet the minimum meal requirement, if possible
-    while (selectedItems.length < minMeals && allItems.length > selectedItems.length) {
-        const item = allItems.find(i => !selectedItems.includes(i));
-        if (item && !tryAddItem(item)) break; // Stop if we can't add without exceeding the goal
     }
 
-    // Adjust counts for variety, if needed, without exceeding caloricGoal
-    selectedItems.forEach((item, index) => {
-        while (item.count < 3) { // Allow up to 3 of each item
-            if (totalCalories + item.caloriesForAllServings <= caloricGoal) {
-                item.count++;
-                totalCalories += item.caloriesForAllServings;
+    // Select items and update counts
+    for (const list of [lowerCalorieItems, higherCalorieItems, allItems]) {
+        for (const item of list) {
+            // Check if item is already selected
+            const existingItem = selectedItems.find(si => si.name === item.name);
+            if (existingItem) {
+                // If count is less than 2, try to add another
+                if (existingItem.count < 3 && addItemIfFits(item)) {
+                    existingItem.count++;
+                }
             } else {
-                break; // Exit if adding another would exceed caloricGoal
+                // If not selected yet, try to add first count
+                if (selectedItems.length <= 20 && addItemIfFits(item)) {
+                    selectedItems.push({ ...item, count: 1 });
+                }
+            }
+
+            if (totalCalories >= caloricGoal - 100) {
+                break;
             }
         }
-    });
+    }
 
-    return selectedItems;
+    // Convert selected items to tuples
+    const selectedItemsTuples = selectedItems.map(item => ({
+        ...item,
+        count: item.count
+    }));
+
+    return selectedItemsTuples;
 }
 
-export default getRandomItems
+export default getRandomItems;

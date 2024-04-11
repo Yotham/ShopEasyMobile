@@ -17,7 +17,7 @@ const Settings = () => {
     weight: '',
     gender: '',
     goal: '',
-    // ... add other fields as needed
+    age: currentUser ? currentUser.age.toString() : '',
   });
   const [isLoading, setIsLoading] = useState(true);
 
@@ -29,13 +29,13 @@ const Settings = () => {
 
   };
   useEffect(() => {
-      if (currentUser) {
-          const [feet, inches] = cmToFeetAndInches(currentUser.height);
-          setUpdatedUser({
-              ...currentUser,
-              height: [feet, inches]
-          });
-          setIsLoading(false);
+    if (currentUser) {
+      const [feet, inches] = cmToFeetAndInches(currentUser.height);
+      setUpdatedUser(prev => ({
+        ...prev,
+        height: [feet.toString(), inches.toString()]
+      }));
+      setIsLoading(false);
       }
   }, [currentUser]);
 
@@ -91,17 +91,19 @@ const Settings = () => {
   };
 
   const handleChange = (name, value) => {
-    setUpdatedUser(prevState => ({
-      ...prevState,
+    setUpdatedUser(prev => ({
+      ...prev,
       [name]: value
     }));
   };
 
   const handleHeightChange = (type, value) => {
     const height = [...updatedUser.height];
-    if (type === "feet") height[0] = parseInt(value);
-    else height[1] = parseInt(value);
-    setUpdatedUser(prevState => ({ ...prevState, height }));
+    height[type === "feet" ? 0 : 1] = value; // Update the correct index
+    setUpdatedUser(prev => ({
+      ...prev,
+      height
+    }));
   };
 
   const toggleGenderModal = () => {
@@ -131,24 +133,20 @@ const Settings = () => {
   };
 
   return (
-    <KeyboardAvoidingView 
-      behavior={Platform.OS === "ios" ? "padding" : "height"} 
-      style={{flex: 1}}
-    >
+    <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"} style={styles.container}>
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
         <ScrollView contentContainerStyle={styles.container}>
           <View style={{alignItems: 'center'}}>
           <View style={styles.container}>
             <Text style={styles.title}>Whats new, {username}? </Text>
-            <Text style={styles.inputLabel}>Age</Text>
-          <TextInput
-            placeholderTextColor="#555"
-            style={styles.input}
-            placeholder={currentUser ? currentUser.age.toString() : ''} // Convert age to string
-            value={updatedUser.age}
-            onChangeText={value => handleChange('age', value)}
-            keyboardType="numeric"
-          />
+            <Text style={styles.inputLabel}>feet</Text>
+            <TextInput
+              style={styles.input}
+              placeholder="Age"
+              value={updatedUser.age}
+              onChangeText={value => handleChange('age', value)}
+              keyboardType="numeric"
+            />
 
           <Text style={styles.inputLabel}>Height</Text>
           <View style={styles.weightContainer}>
@@ -183,7 +181,7 @@ const Settings = () => {
                 placeholderTextColor="#555"
                 style={styles.input}
                 placeholder={currentUser && currentUser.weight !== null ? currentUser.weight.toString() : ''}
-                value={updatedUser.weigh}
+                value={updatedUser.weight}
                 onChangeText ={value => handleChange('weight', value)}
                 keyboardType="numeric"
               />

@@ -3,7 +3,7 @@ import { View, Text, TouchableOpacity, ScrollView, StyleSheet, ActivityIndicator
 import { Picker } from '@react-native-picker/picker';
 import { useAuth } from '../context/AuthContext';
 import getRandomItems from '../components/ListGeneration.js';
-import Icon from 'react-native-vector-icons/MaterialIcons';
+import { IconButton } from 'react-native-paper';
 import { useNavigation } from '@react-navigation/native';
 
 import HannafordData from '../Data/HannafordData.json';
@@ -198,10 +198,18 @@ const GenerateScreen = () => {
 
   return (
     <SafeAreaView style={styles.container}>
+      <IconButton
+        icon="cog"
+        size={20}
+        style={styles.SettingsIcon}
+        iconColor="white"
+        onPress={() => {
+          console.log('IconButton pressed');
+          setShowMenu(true)
+        }}
+      />
 
-      <TouchableOpacity onPress={() => alert('Icon Touched!')}>
-        <Icon name="settings" size={30} color="black" />
-      </TouchableOpacity>
+      <Menu />
 
       <Picker
         selectedValue={selectedLabel}
@@ -366,7 +374,8 @@ const styles = StyleSheet.create({
     backgroundColor: '#121212',
   },
   SettingsIcon: {
-    top: 10,
+    top: -15,
+    right: -320
   },
   menuOverlay: {
     flex: 1,
