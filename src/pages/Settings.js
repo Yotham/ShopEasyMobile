@@ -143,7 +143,7 @@ const Settings = () => {
             <TextInput
               style={styles.input}
               placeholder="Age"
-              value={updatedUser.age}
+              value={updatedUser.age.toString()}
               onChangeText={value => handleChange('age', value)}
               keyboardType="numeric"
             />
@@ -156,7 +156,7 @@ const Settings = () => {
                 placeholderTextColor="#555"
                 style={styles.input}
                 placeholder={currentUser ? currentUser.height.toString() : ''}
-                value={updatedUser.height[0]}
+                value={updatedUser.height[0].toString()}
                 onChangeText={value => handleHeightChange('feet', value)}
                 keyboardType="numeric"
               />
@@ -166,8 +166,8 @@ const Settings = () => {
               <TextInput
                 placeholderTextColor="#555"
                 style={styles.input}
-                placeholder={currentUser ? (currentUser.height * 0.453592).toFixed(2) : ''}
-                value={updatedUser.height[1]}
+                placeholder={currentUser ? (currentUser.height.toString() * 0.453592).toFixed(2) : ''}
+                value={updatedUser.height[1].toString()}
                 onChangeText={value => handleHeightChange('inches', value)}
                 keyboardType="numeric"
               />
@@ -181,7 +181,7 @@ const Settings = () => {
                 placeholderTextColor="#555"
                 style={styles.input}
                 placeholder={currentUser && currentUser.weight !== null ? currentUser.weight.toString() : ''}
-                value={updatedUser.weight}
+                value={updatedUser.weight.toString()}
                 onChangeText ={value => handleChange('weight', value)}
                 keyboardType="numeric"
               />
@@ -266,11 +266,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: 'rgba(0, 0, 0, 0.5)', // Semi-transparent dark background
-  },
-  modalContent: {
-    backgroundColor: '#333333', // Dark background color
-    padding: 20,
-    borderRadius: 10,
   },
   modalItem: {
     paddingVertical: 10,
