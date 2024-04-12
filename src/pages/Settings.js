@@ -139,7 +139,7 @@ const Settings = () => {
           <View style={{alignItems: 'center'}}>
           <View style={styles.container}>
             <Text style={styles.title}>Whats new, {username}? </Text>
-            <Text style={styles.inputLabel}>feet</Text>
+            <Text style={styles.inputLabel}>Age</Text>
             <TextInput
               style={styles.input}
               placeholder="Age"

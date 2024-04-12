@@ -155,10 +155,10 @@ const GenerateScreen = () => {
 
     const totals = randomItems.reduce(
       (acc, item) => {
-        acc.calories += item.caloriesPS;
-        acc.protein += item.ProteinPS;
-        acc.fats += item.FatPS;
-        acc.carbs += item.CarbPS;
+        acc.calories += item.caloriesPS * item.count;
+        acc.protein += item.ProteinPS * item.count;
+        acc.fats += item.FatPS * item.count;
+        acc.carbs += item.CarbPS * item.count;
         return acc;
       },
       { calories: 0, protein: 0, fats: 0, carbs: 0 }
