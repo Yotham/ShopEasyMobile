@@ -42,30 +42,6 @@ const GenerateScreen = () => {
   }, []);
 
   useEffect(() => {
-    if (generatePressed && randomItems.length > 0) {
-      const totals = randomItems.reduce(
-        (acc, item) => {
-          acc.calories += item.caloriesPS;
-          acc.protein += item.ProteinPS;
-          acc.fats += item.FatPS;
-          acc.carbs += item.CarbPS;
-          return acc;
-        },
-        { calories: 0, protein: 0, fats: 0, carbs: 0 }
-      );
-  
-      setDailyAverages({
-        calories: totals.calories / 7,
-        protein: totals.protein / 7,
-        fats: totals.fats / 7,
-        carbs: totals.carbs / 7,
-      });
-  
-      setShowAverages(true); // Ensure this is set to show the averages
-    }
-  }, [randomItems, generatePressed]); // Depend on randomItems and generatePressed
-  
-  useEffect(() => {
     if (viewMode === 'weeklyPlan' && randomItems.length > 0) {
       const plan = distributeMealsWeekly(randomItems);
       setWeeklyPlan(plan);
@@ -155,10 +131,11 @@ const GenerateScreen = () => {
 
     const totals = randomItems.reduce(
       (acc, item) => {
-        acc.calories += item.caloriesPS * item.count;
-        acc.protein += item.ProteinPS * item.count;
-        acc.fats += item.FatPS * item.count;
-        acc.carbs += item.CarbPS * item.count;
+        acc.calories += item.caloriesPS * item.count * item.numServings;
+        acc.protein += item.ProteinPS * item.count * item.numServings;
+        acc.fats += item.FatPS * item.count * item.numServings;
+        acc.carbs += item.CarbPS * item.count * item.numServings;
+        console.log(`Current Totals: Calories: ${acc.calories}, Protein: ${acc.protein}, Fats: ${acc.fats}, Carbs: ${acc.carbs}`);
         return acc;
       },
       { calories: 0, protein: 0, fats: 0, carbs: 0 }
@@ -170,7 +147,7 @@ const GenerateScreen = () => {
       fats: totals.fats / 7,
       carbs: totals.carbs / 7,
     });
-  
+    
     setShowAverages(true);
   };
 
@@ -229,10 +206,10 @@ const GenerateScreen = () => {
         <View style={styles.averagesContainer}>
           <Text style={styles.averagesDetail}>Daily Averages:</Text>
           <View style={{flexDirection: 'row', justifyContent: 'space-evenly'}}>
-            <Text style={styles.averagesDetail}>Calories: <Text style={styles.boldText}>{dailyAverages.calories.toFixed(2)}</Text></Text>
-            <Text style={styles.averagesDetail}>Protein: <Text style={styles.boldText}>{dailyAverages.protein.toFixed(2)}g</Text></Text>
-            <Text style={styles.averagesDetail}>Fats: <Text style={styles.boldText}>{dailyAverages.fats.toFixed(2)}g</Text></Text>
-            <Text style={styles.averagesDetail}>Carbs: <Text style={styles.boldText}>{dailyAverages.carbs.toFixed(2)}g</Text></Text>
+            <Text style={styles.averagesDetail}>Calories: <Text style={styles.boldText}>{dailyAverages.calories.toFixed(0)}</Text></Text>
+            <Text style={styles.averagesDetail}>Protein: <Text style={styles.boldText}>{dailyAverages.protein.toFixed(0)}g</Text></Text>
+            <Text style={styles.averagesDetail}>Fats: <Text style={styles.boldText}>{dailyAverages.fats.toFixed(0)}g</Text></Text>
+            <Text style={styles.averagesDetail}>Carbs: <Text style={styles.boldText}>{dailyAverages.carbs.toFixed(0)}g</Text></Text>
           </View>
         </View>
       )}
