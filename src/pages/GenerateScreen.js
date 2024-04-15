@@ -194,7 +194,7 @@ const GenerateScreen = () => {
       <Picker
         selectedValue={selectedLabel}
         onValueChange={(itemValue) => handleSelectionChange(itemValue)}
-        itemStyle={{color: "white", fontSize:17, top:0, height: 200 }}
+        itemStyle={{color: "white", fontSize:17, top:-30, height: 150 }}
       >
         <Picker.Item label="Hannaford" value="HannafordData" />
         <Picker.Item label="Trader Joe's" value="TraderJoesData" />
@@ -327,7 +327,7 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     justifyContent: 'center',
     alignItems: 'center',
-    marginTop: 20,
+    marginTop: 15,
   },
   container: {
     flex: 1,
