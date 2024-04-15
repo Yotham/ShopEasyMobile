@@ -34,6 +34,28 @@ const GenerateScreen = () => {
   });
 
   useEffect(() => {
+    const totals = randomItems.reduce(
+      (acc, item) => {
+        acc.calories += item.caloriesPS * item.count * item.numServings;
+        acc.protein += item.ProteinPS * item.count * item.numServings;
+        acc.fats += item.FatPS * item.count * item.numServings;
+        acc.carbs += item.CarbPS * item.count * item.numServings;
+        return acc;
+      },
+      { calories: 0, protein: 0, fats: 0, carbs: 0 }
+    );
+  
+    setDailyAverages({
+      calories: totals.calories / 7,
+      protein: totals.protein / 7,
+      fats: totals.fats / 7,
+      carbs: totals.carbs / 7,
+    });
+  
+  }, [randomItems]); 
+  
+
+  useEffect(() => {
     const timer = setTimeout(() => {setIsLoading(false);}, 500);
     return () => {
         clearTimeout(timer);
@@ -128,25 +150,6 @@ const GenerateScreen = () => {
     } else {
       alert('Please log in to generate items based on your nutritional goals.');
     }
-
-    const totals = randomItems.reduce(
-      (acc, item) => {
-        acc.calories += item.caloriesPS * item.count * item.numServings;
-        acc.protein += item.ProteinPS * item.count * item.numServings;
-        acc.fats += item.FatPS * item.count * item.numServings;
-        acc.carbs += item.CarbPS * item.count * item.numServings;
-        console.log(`Current Totals: Calories: ${acc.calories}, Protein: ${acc.protein}, Fats: ${acc.fats}, Carbs: ${acc.carbs}`);
-        return acc;
-      },
-      { calories: 0, protein: 0, fats: 0, carbs: 0 }
-    );
-  
-    setDailyAverages({
-      calories: totals.calories / 7,
-      protein: totals.protein / 7,
-      fats: totals.fats / 7,
-      carbs: totals.carbs / 7,
-    });
     
     setShowAverages(true);
   };
