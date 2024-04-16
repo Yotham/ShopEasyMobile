@@ -13,7 +13,7 @@ function UserInformationGenderAge({ navigation }) {
     return (
         <View style={styles.fullScreenContainer}>
             <View style={styles.contentContainer}>
-            <Text style={styles.label}>What's your gender?</Text>
+            <Text style={styles.label}>What's your biological sex?</Text>
             <View style={styles.buttonContainer}>
                 {['Male', 'Female', 'Other'].map((gender) => (
                     <TouchableOpacity

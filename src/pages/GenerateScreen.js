@@ -256,24 +256,46 @@ const GenerateScreen = () => {
               <Text style={styles.dayTitle}>Day {index + 1}</Text>
               {day.breakfast && (
                 <View style={styles.mealItem}>
+                  <TouchableOpacity
+                    onPress={() => {
+                      setSelectedItem(day.breakfast);
+                      setItemModalOpen(true);
+                    }}
+                  >
                   <Text style={styles.mealItemText}>Breakfast: {day.breakfast.name}</Text>
+                  </TouchableOpacity>
                 </View>
               )}
               {day.lunch && (
                 <View style={styles.mealItem}>
+                  <TouchableOpacity
+                    onPress={() => {
+                      setSelectedItem(day.lunch);
+                      setItemModalOpen(true);
+                    }}
+                  >
                   <Text style={styles.mealItemText}>Lunch: {day.lunch.name}</Text>
+                  </TouchableOpacity>
                 </View>
               )}
               {day.dinner && (
                 <View style={styles.mealItem}>
+                  <TouchableOpacity
+                    onPress={() => {
+                      setSelectedItem(day.dinner);
+                      setItemModalOpen(true);
+                    }}
+                  >
                   <Text style={styles.mealItemText}>Dinner: {day.dinner.name}</Text>
+                  </TouchableOpacity>
                 </View>
               )}
-              <Text style={styles.mealItemText}>Total Calories: {day.totalCalories.toFixed(2)}</Text>
+              <Text style={styles.CaloriesText}>Total Calories: {day.totalCalories.toFixed(2)}</Text>
             </View>
           ))}
         </ScrollView>
       )}
+
       
       {isItemModalOpen && (
         <TouchableOpacity
@@ -483,6 +505,11 @@ const styles = StyleSheet.create({
     color: '#ffffff',
     fontSize: 16,
   },
+  CaloriesText: {
+    marginTop: 10,
+    color: '#ffffff',
+    fontSize: 16,
+  }
   
 });
 
