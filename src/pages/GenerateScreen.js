@@ -34,6 +34,28 @@ const GenerateScreen = () => {
   });
 
   useEffect(() => {
+    const totals = randomItems.reduce(
+      (acc, item) => {
+        acc.calories += item.caloriesPS * item.count * item.numServings;
+        acc.protein += item.ProteinPS * item.count * item.numServings;
+        acc.fats += item.FatPS * item.count * item.numServings;
+        acc.carbs += item.CarbPS * item.count * item.numServings;
+        return acc;
+      },
+      { calories: 0, protein: 0, fats: 0, carbs: 0 }
+    );
+  
+    setDailyAverages({
+      calories: totals.calories / 7,
+      protein: totals.protein / 7,
+      fats: totals.fats / 7,
+      carbs: totals.carbs / 7,
+    });
+  
+  }, [randomItems]); 
+  
+
+  useEffect(() => {
     const timer = setTimeout(() => {setIsLoading(false);}, 500);
     return () => {
         clearTimeout(timer);
@@ -41,30 +63,6 @@ const GenerateScreen = () => {
     }
   }, []);
 
-  useEffect(() => {
-    if (generatePressed && randomItems.length > 0) {
-      const totals = randomItems.reduce(
-        (acc, item) => {
-          acc.calories += item.caloriesPS;
-          acc.protein += item.ProteinPS;
-          acc.fats += item.FatPS;
-          acc.carbs += item.CarbPS;
-          return acc;
-        },
-        { calories: 0, protein: 0, fats: 0, carbs: 0 }
-      );
-  
-      setDailyAverages({
-        calories: totals.calories / 7,
-        protein: totals.protein / 7,
-        fats: totals.fats / 7,
-        carbs: totals.carbs / 7,
-      });
-  
-      setShowAverages(true); // Ensure this is set to show the averages
-    }
-  }, [randomItems, generatePressed]); // Depend on randomItems and generatePressed
-  
   useEffect(() => {
     if (viewMode === 'weeklyPlan' && randomItems.length > 0) {
       const plan = distributeMealsWeekly(randomItems);
@@ -152,25 +150,7 @@ const GenerateScreen = () => {
     } else {
       alert('Please log in to generate items based on your nutritional goals.');
     }
-
-    const totals = randomItems.reduce(
-      (acc, item) => {
-        acc.calories += item.caloriesPS;
-        acc.protein += item.ProteinPS;
-        acc.fats += item.FatPS;
-        acc.carbs += item.CarbPS;
-        return acc;
-      },
-      { calories: 0, protein: 0, fats: 0, carbs: 0 }
-    );
-  
-    setDailyAverages({
-      calories: totals.calories / 7,
-      protein: totals.protein / 7,
-      fats: totals.fats / 7,
-      carbs: totals.carbs / 7,
-    });
-  
+    
     setShowAverages(true);
   };
 
@@ -214,7 +194,7 @@ const GenerateScreen = () => {
       <Picker
         selectedValue={selectedLabel}
         onValueChange={(itemValue) => handleSelectionChange(itemValue)}
-        itemStyle={{color: "white", fontSize:17, top:0, height: 200 }}
+        itemStyle={{color: "white", fontSize:17, top:-30, height: 150 }}
       >
         <Picker.Item label="Hannaford" value="HannafordData" />
         <Picker.Item label="Trader Joe's" value="TraderJoesData" />
@@ -229,10 +209,10 @@ const GenerateScreen = () => {
         <View style={styles.averagesContainer}>
           <Text style={styles.averagesDetail}>Daily Averages:</Text>
           <View style={{flexDirection: 'row', justifyContent: 'space-evenly'}}>
-            <Text style={styles.averagesDetail}>Calories: <Text style={styles.boldText}>{dailyAverages.calories.toFixed(2)}</Text></Text>
-            <Text style={styles.averagesDetail}>Protein: <Text style={styles.boldText}>{dailyAverages.protein.toFixed(2)}g</Text></Text>
-            <Text style={styles.averagesDetail}>Fats: <Text style={styles.boldText}>{dailyAverages.fats.toFixed(2)}g</Text></Text>
-            <Text style={styles.averagesDetail}>Carbs: <Text style={styles.boldText}>{dailyAverages.carbs.toFixed(2)}g</Text></Text>
+            <Text style={styles.averagesDetail}>Calories: <Text style={styles.boldText}>{dailyAverages.calories.toFixed(0)}</Text></Text>
+            <Text style={styles.averagesDetail}>Protein: <Text style={styles.boldText}>{dailyAverages.protein.toFixed(0)}g</Text></Text>
+            <Text style={styles.averagesDetail}>Fats: <Text style={styles.boldText}>{dailyAverages.fats.toFixed(0)}g</Text></Text>
+            <Text style={styles.averagesDetail}>Carbs: <Text style={styles.boldText}>{dailyAverages.carbs.toFixed(0)}g</Text></Text>
           </View>
         </View>
       )}
@@ -276,24 +256,46 @@ const GenerateScreen = () => {
               <Text style={styles.dayTitle}>Day {index + 1}</Text>
               {day.breakfast && (
                 <View style={styles.mealItem}>
+                  <TouchableOpacity
+                    onPress={() => {
+                      setSelectedItem(day.breakfast);
+                      setItemModalOpen(true);
+                    }}
+                  >
                   <Text style={styles.mealItemText}>Breakfast: {day.breakfast.name}</Text>
+                  </TouchableOpacity>
                 </View>
               )}
               {day.lunch && (
                 <View style={styles.mealItem}>
+                  <TouchableOpacity
+                    onPress={() => {
+                      setSelectedItem(day.lunch);
+                      setItemModalOpen(true);
+                    }}
+                  >
                   <Text style={styles.mealItemText}>Lunch: {day.lunch.name}</Text>
+                  </TouchableOpacity>
                 </View>
               )}
               {day.dinner && (
                 <View style={styles.mealItem}>
+                  <TouchableOpacity
+                    onPress={() => {
+                      setSelectedItem(day.dinner);
+                      setItemModalOpen(true);
+                    }}
+                  >
                   <Text style={styles.mealItemText}>Dinner: {day.dinner.name}</Text>
+                  </TouchableOpacity>
                 </View>
               )}
-              <Text style={styles.mealItemText}>Total Calories: {day.totalCalories.toFixed(2)}</Text>
+              <Text style={styles.CaloriesText}>Total Calories: {day.totalCalories.toFixed(2)}</Text>
             </View>
           ))}
         </ScrollView>
       )}
+
       
       {isItemModalOpen && (
         <TouchableOpacity
@@ -347,7 +349,7 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     justifyContent: 'center',
     alignItems: 'center',
-    marginTop: 20,
+    marginTop: 15,
   },
   container: {
     flex: 1,
@@ -503,6 +505,11 @@ const styles = StyleSheet.create({
     color: '#ffffff',
     fontSize: 16,
   },
+  CaloriesText: {
+    marginTop: 10,
+    color: '#ffffff',
+    fontSize: 16,
+  }
   
 });
 
