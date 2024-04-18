@@ -1,12 +1,26 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, Button, StyleSheet, Modal, TouchableOpacity, ScrollView, KeyboardAvoidingView, Platform, TouchableWithoutFeedback, Keyboard } from 'react-native';
+import {
+  StyleSheet,
+  SafeAreaView,
+  View,
+  Modal,
+  ScrollView,
+  Text,
+  TextInput,
+  Button,
+  TouchableOpacity,
+  Switch,
+  Image,
+} from 'react-native';
+import FeatherIcon from 'react-native-vector-icons/Feather';
+
 import { useNavigation } from '@react-navigation/native';
 import { useAuth } from '../context/AuthContext';
 import * as SecureStore from 'expo-secure-store';
 
 const ip = 'https://shop-ez.netlify.app/';
 
-const Settings = () => {
+const Settings2 = () => {
   const navigation = useNavigation();
 
   const { currentUser } = useAuth();
@@ -48,6 +62,12 @@ const Settings = () => {
   const [genderModalVisible, setGenderModalVisible] = useState(false);
   const [goalModalVisible, setGoalModalVisible] = useState(false);
   const [goal, setGoal] = useState('');
+  const [dropdownVisible, setDropdownVisible] = useState(false);
+
+  const handleGoalSelection = (selectedGoal) => {
+    setGoal(selectedGoal);
+    setDropdownVisible(false);
+  };
 
   const getToken = async () => {
     try {
@@ -133,156 +153,226 @@ const Settings = () => {
   };
 
   return (
-    <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"} style={styles.container}>
-      <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-        <ScrollView contentContainerStyle={styles.container}>
-          <View style={{alignItems: 'center'}}>
-          <View style={styles.container}>
-            <Text style={styles.title}>Whats new, {username}? </Text>
-            <Text style={styles.inputLabel}>feet</Text>
-            <TextInput
-              style={styles.input}
-              placeholder="Age"
-              value={updatedUser.age.toString()}
-              onChangeText={value => handleChange('age', value)}
-              keyboardType="numeric"
-            />
+    <SafeAreaView style={{ flex: 1, backgroundColor: '#000' }}>
+      <View style={styles.container}>
+        <ScrollView>
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>Preferences</Text>
 
-          <Text style={styles.inputLabel}>Height</Text>
-          <View style={styles.weightContainer}>
-            <View style={styles.weightInput}>
-              <Text style={styles.inputLabel}>feet</Text>
-              <TextInput
-                placeholderTextColor="#555"
-                style={styles.input}
-                placeholder={currentUser ? currentUser.height.toString() : ''}
-                value={updatedUser.height[0].toString()}
-                onChangeText={value => handleHeightChange('feet', value)}
-                keyboardType="numeric"
-              />
+            <View style={styles.row}>
+
+                <Text style={styles.rowLabel}>Age</Text>
+
+                <View style={[styles.rowSpacer, { flexDirection: 'row', alignItems: 'center' }]}>
+                    {/* Empty space to push the text further right */}
+                    <View style={{ flex: 1 }}></View>
+
+                    {/* Text input */}
+                    <TextInput
+                    style={{ backgroundColor: '#ccc', borderRadius: 8, padding: 8, marginLeft: 8 }}
+                    placeholderTextColor="#999"
+                    placeholder="Age"
+                    value={updatedUser.age.toString()}
+                    onChangeText={value => handleChange('age', value)}
+                    keyboardType="numeric"
+                    />
+                </View>
             </View>
-            <View style={styles.weightInput}>
-              <Text style={styles.inputLabel}>inches</Text>
-              <TextInput
-                placeholderTextColor="#555"
-                style={styles.input}
-                placeholder={currentUser ? (currentUser.height.toString() * 0.453592).toFixed(2) : ''}
-                value={updatedUser.height[1].toString()}
-                onChangeText={value => handleHeightChange('inches', value)}
-                keyboardType="numeric"
-              />
+
+            <View style={styles.row}>
+
+                <Text style={styles.rowLabel}>Height</Text>
+
+                <View style={[styles.rowSpacer, { flexDirection: 'row', alignItems: 'center' }]}>
+                    {/* Empty space to push the text further right */}
+                    <View style={{ flex: 1 }}></View>
+
+                    {/* Text input */}
+                    <TextInput
+                        placeholderTextColor="#555"
+                        style={{ backgroundColor: '#ccc', borderRadius: 8, padding: 8, marginLeft: 8 }}
+                        placeholder={currentUser ? currentUser.height.toString() : ''}
+                        value={updatedUser.height[0].toString()}
+                        onChangeText={value => handleHeightChange('feet', value)}
+                        keyboardType="numeric"
+                    />
+                    <TextInput
+                        style={{ backgroundColor: '#ccc', borderRadius: 8, padding: 8, marginLeft: 8 }}
+                        placeholderTextColor="#555"
+                        placeholder={currentUser ? (currentUser.height.toString() * 0.453592).toFixed(2) : ''}
+                        value={updatedUser.height[1].toString()}
+                        onChangeText={value => handleHeightChange('inches', value)}
+                        keyboardType="numeric"
+                    />
+                    
+                </View>
             </View>
-          </View>
 
-          <Text style={styles.inputLabel}>Weight (lbs)</Text>
-          <View style={styles.weightContainer}>
-            <View style={styles.weightInput}>
-              <TextInput
-                placeholderTextColor="#555"
-                style={styles.input}
-                placeholder={currentUser && currentUser.weight !== null ? currentUser.weight.toString() : ''}
-                value={updatedUser.weight.toString()}
-                onChangeText ={value => handleChange('weight', value)}
-                keyboardType="numeric"
-              />
+            <View style={styles.row}>
+
+                <Text style={styles.rowLabel}>Weight</Text>
+
+                <View style={[styles.rowSpacer, { flexDirection: 'row', alignItems: 'center' }]}>
+                    {/* Empty space to push the text further right */}
+                    <View style={{ flex: 1 }}></View>
+
+                    {/* Text input */}
+                    <TextInput
+                    style={{ backgroundColor: '#ccc', borderRadius: 8, padding: 8, marginLeft: 8 }}
+                    placeholderTextColor="#999"
+                    placeholder={currentUser && currentUser.weight !== null ? currentUser.weight.toString() : ''}
+                    value={updatedUser.weight.toString()}
+                    onChangeText ={value => handleChange('weight', value)}
+                    keyboardType="numeric"
+                    />
+                </View>
             </View>
-          </View>
+            <TouchableOpacity onPress={() => setDropdownVisible(!dropdownVisible)}>
+                <View style={styles.row}>
+                    <Text style={styles.rowLabel}>Goal</Text>
+                    <View style={[styles.rowSpacer, { flexDirection: 'row', alignItems: 'center' }]}>
+                    {/* Empty space to push the text further right */}
+                    <View style={{ flex: 1 }}></View>
+                    {/* Text input */}
+                    <Text
+                        style={{ backgroundColor: '#ccc', borderRadius: 8, padding: 8, marginLeft: 8, overflow: 'hidden' }}
+                        placeholderTextColor="#999"
+                        value={updatedUser.goal.toString()}
+                        onChangeText={value => handleChange('goal', value)}
+                    />
+                    </View>
+                </View>
+            </TouchableOpacity>
 
-          <TouchableOpacity style={styles.input} onPress={toggleGoalModal}>
-            <Text style={styles.modalText}>{goal || (currentUser ? currentUser.goal : '')}</Text>
-          </TouchableOpacity>
-
-          <Modal visible={goalModalVisible} transparent={true} animationType="slide">
-            <View style={styles.modalContainer}>
-              <TouchableOpacity style={styles.modalText} onPress={toggleGoalModal} />
-              <TouchableOpacity style={styles.modalItem} onPress={() => { setGoal('Gain Weight'); toggleGoalModal(); }}>
-                <Text style={styles.modalText}>Gain Weight</Text>
-              </TouchableOpacity>
-              <TouchableOpacity style={styles.modalItem} onPress={() => { setGoal('Lose Weight'); toggleGoalModal(); }}>
-                <Text style={styles.modalText}>Lose Weight</Text>
-              </TouchableOpacity>
-              <TouchableOpacity style={styles.modalItem} onPress={() => { setGoal('Maintain Weight'); toggleGoalModal(); }}>
-                <Text style={styles.modalText}>Maintain Weight</Text>
-              </TouchableOpacity>
-            </View>
-          </Modal>
+            {dropdownVisible && (
+                <View style={styles.dropdown}>
+                <TouchableOpacity style={styles.dropdownItem} onPress={() => handleGoalSelection('Gain Weight')}>
+                    <Text style={styles.dropdownText}>Gain Weight</Text>
+                </TouchableOpacity>
+                <TouchableOpacity style={styles.dropdownItem} onPress={() => handleGoalSelection('Lose Weight')}>
+                    <Text style={styles.dropdownText}>Lose Weight</Text>
+                </TouchableOpacity>
+                <TouchableOpacity style={styles.dropdownItem} onPress={() => handleGoalSelection('Maintain Weight')}>
+                    <Text style={styles.dropdownText}>Maintain Weight</Text>
+                </TouchableOpacity>
+                </View>
+            )}
+                            
+            
 
 
-          <Button title="Save" onPress={handleSave} />
-          </View>
+            <Button title="Save" onPress={handleSave} />
           </View>
         </ScrollView>
-      </TouchableWithoutFeedback>
-    </KeyboardAvoidingView>
-    
+      </View>
+    </SafeAreaView>
   );
-};
+}
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    justifyContent: 'center',
+    padding: 0,
+    flexGrow: 1,
+    flexShrink: 1,
+    flexBasis: 0,
+  },
+  /** Profile */
+  profile: {
+    padding: 24,
+    backgroundColor: '#fff',
+    flexDirection: 'column',
     alignItems: 'center',
-    backgroundColor: '#121212', // Dark background color
-    color: '#ffffff', // Light text color
-  },
-  title: {
-    paddingBottom: 150,
-    justifyContent: 'flex-start',
-    fontFamily: 'AvenirNextCondensed-Heavy',
-    fontSize: 40,
-    color: '#ffffff', // Light text color
-  },  
-  input: {
-    height: 40,
-    width: '80%',
-    borderColor: '#ffffff', // Light border color
-    borderRadius: 8,
-    borderWidth: 1,
-    marginBottom: 20,
-    paddingHorizontal: 10,
     justifyContent: 'center',
-    textAlign: 'center', // Center text horizontally
-    backgroundColor: '#333333', // Dark background color
-    color: 'white'
   },
-  weightContainer: {
-    flexDirection: 'row', // Display children side by side
-    justifyContent: 'space-between', // Space evenly between children
-    alignItems: 'center', // Center content horizontally
-    width: '80%',
-    borderRadius: 20, // Added borderRadius
-    paddingHorizontal: 10, // Added paddingHorizontal for spacing
-    paddingVertical: 10, // Added paddingVertical for spacing
-    backgroundColor: '#333333', // Dark background color
-    marginBottom: 20,
+  profileAvatarWrapper: {
+    position: 'relative',
   },
-  weightInput: {
-    width: '48%', // Adjust width to accommodate both inputs with a small space between
-    alignItems: 'center', // Center content horizontally
+  profileAvatar: {
+    width: 72,
+    height: 72,
+    borderRadius: 9999,
   },
-  modalContainer: {
-    flex: 1,
-    justifyContent: 'center',
+  profileAction: {
+    position: 'absolute',
+    right: -4,
+    bottom: -10,
     alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.5)', // Semi-transparent dark background
-  },
-  modalItem: {
-    paddingVertical: 10,
-    borderBottomWidth: 1,
-    borderBottomColor: '#cccccc', // Light border color
-  },
-  inputLabel: {
-    marginBottom: 5,
-    color: '#ffffff', // Light text color
-    fontSize: 14, // Adjust the font size of the label text
-  },
-  modalText: {
-    color: '#555', // Set text color to #555
     justifyContent: 'center',
+    width: 28,
+    height: 28,
+    borderRadius: 9999,
+    backgroundColor: '#007bff',
+  },
+  profileName: {
+    marginTop: 20,
+    fontSize: 19,
+    fontWeight: '600',
+    color: '#414d63',
     textAlign: 'center',
-  },  
+  },
+  profileAddress: {
+    marginTop: 5,
+    fontSize: 16,
+    color: '#989898',
+    textAlign: 'center',
+  },
+  /** Section */
+  section: {
+    paddingHorizontal: 24,
+  },
+  sectionTitle: {
+    paddingVertical: 12,
+    fontSize: 12,
+    fontWeight: '600',
+    color: '#9e9e9e',
+    textTransform: 'uppercase',
+    letterSpacing: 1.1,
+  },
+  /** Row */
+  row: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'flex-start',
+    height: 50,
+    backgroundColor: '#f2f2f2',
+    borderRadius: 8,
+    marginBottom: 12,
+    paddingLeft: 12,
+    paddingRight: 12,
+  },
+  rowIcon: {
+    width: 32,
+    height: 32,
+    borderRadius: 9999,
+    marginRight: 12,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  rowLabel: {
+    fontSize: 17,
+    fontWeight: '400',
+    color: '#0c0c0c',
+  },
+  rowSpacer: {
+    flexGrow: 1,
+    flexShrink: 1,
+    flexBasis: 0,
+  },
+  dropdown: {
+    backgroundColor: '#fff',
+    borderRadius: 8,
+    elevation: 2,
+    marginTop: 8,
+  },
+  dropdownItem: {
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+  },
+  dropdownText: {
+    fontSize: 16,
+    color: '#333',
+  },
 });
 
-
-export default Settings;
+export default Settings2;

@@ -19,7 +19,7 @@ function AppNavigation() {
     return (
       <Stack.Navigator>
         <Stack.Screen name="Loading" component={LoadingScreen} options={{ headerShown: false }}/>
-      </Stack.Navigator>
+       </Stack.Navigator>
     );
   }
 
