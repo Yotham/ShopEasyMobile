@@ -3,16 +3,12 @@ import {
   StyleSheet,
   SafeAreaView,
   View,
-  Modal,
   ScrollView,
   Text,
   TextInput,
   Button,
   TouchableOpacity,
-  Switch,
-  Image,
 } from 'react-native';
-import FeatherIcon from 'react-native-vector-icons/Feather';
 
 import { useNavigation } from '@react-navigation/native';
 import { useAuth } from '../context/AuthContext';
@@ -33,7 +29,9 @@ const Settings = () => {
     goal: '',
     age: currentUser ? currentUser.age.toString() : '',
   });
+
   const [isLoading, setIsLoading] = useState(true);
+  const [dropdownVisible, setDropdownVisible] = useState(false);
 
   const cmToFeetAndInches = (cm) => {
       const totalInches = cm / 2.54;
@@ -42,6 +40,7 @@ const Settings = () => {
       return [feet, inches];
 
   };
+
   useEffect(() => {
     if (currentUser) {
       const [feet, inches] = cmToFeetAndInches(currentUser.height);
@@ -53,21 +52,14 @@ const Settings = () => {
       }
   }, [currentUser]);
 
-  const [age, setAge] = useState('');
-  const [height, setHeight] = useState('');
-  const [weightLbs, setWeightLbs] = useState('');
-  const [weightKg, setWeightKg] = useState('');
-  const [heightft, setHeightft] = useState('');
-  const [heightcm, setHeightcm] = useState('');
-  const [genderModalVisible, setGenderModalVisible] = useState(false);
-  const [goalModalVisible, setGoalModalVisible] = useState(false);
-  const [goal, setGoal] = useState('');
-  const [dropdownVisible, setDropdownVisible] = useState(false);
-
   const handleGoalSelection = (selectedGoal) => {
-    setGoal(selectedGoal);
+    setUpdatedUser(prev => ({
+      ...prev,
+      goal: selectedGoal
+    }));
     setDropdownVisible(false);
   };
+  
 
   const getToken = async () => {
     try {
@@ -119,37 +111,11 @@ const Settings = () => {
 
   const handleHeightChange = (type, value) => {
     const height = [...updatedUser.height];
-    height[type === "feet" ? 0 : 1] = value; // Update the correct index
+    height[type === "feet" ? 0 : 1] = value.toString(); // Update the correct index
     setUpdatedUser(prev => ({
       ...prev,
       height
     }));
-  };
-
-  const toggleGenderModal = () => {
-    setGenderModalVisible(!genderModalVisible);
-  };
-
-  const toggleGoalModal = () => {
-    setGoalModalVisible(!goalModalVisible);
-  };
-
-  const poundsToKilograms = (lbs) => {
-    return (lbs * 0.453592).toFixed(2); // 1 pound is approximately 0.453592 kilograms
-  };
-
-  const kilogramsToPounds = (kg) => {
-    return (kg / 0.453592).toFixed(2); // 1 kilogram is approximately 2.20462 pounds
-  };
-
-  const handleWeightLbsChange = (text) => {
-    setWeightLbs(text);
-    setWeightKg(poundsToKilograms(parseFloat(text)).toString());
-  };
-
-  const handleWeightKgChange = (text) => {
-    setWeightKg(text);
-    setWeightLbs(kilogramsToPounds(parseFloat(text)).toString());
   };
 
   return (
@@ -233,7 +199,6 @@ const Settings = () => {
                     <View style={[styles.rowSpacer, { flexDirection: 'row', alignItems: 'center' }]}>
                     {/* Empty space to push the text further right */}
                     <View style={{ flex: 1 }}></View>
-                    {/* Text input */}
                     <Text
                         style={{ backgroundColor: '#ccc', borderRadius: 8, padding: 8, marginLeft: 8, overflow: 'hidden' }}
                         placeholderTextColor="#999"
