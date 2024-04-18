@@ -153,44 +153,59 @@ const Settings = () => {
   };
 
   return (
-    <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"} style={styles.container}>
-      <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-        <ScrollView contentContainerStyle={styles.container}>
-          <View style={{alignItems: 'center'}}>
-          <View style={styles.container}>
-            <Text style={styles.title}>Whats new, {username}? </Text>
-            <Text style={styles.inputLabel}>feet</Text>
-            <TextInput
-              style={styles.input}
-              placeholder="Age"
-              value={updatedUser.age.toString()}
-              onChangeText={value => handleChange('age', value)}
-              keyboardType="numeric"
-            />
+    <SafeAreaView style={{ flex: 1, backgroundColor: '#000' }}>
+      <View style={styles.container}>
+        <ScrollView>
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>Preferences</Text>
 
-          <Text style={styles.inputLabel}>Height</Text>
-          <View style={styles.weightContainer}>
-            <View style={styles.weightInput}>
-              <Text style={styles.inputLabel}>feet</Text>
-              <TextInput
-                placeholderTextColor="#555"
-                style={styles.input}
-                placeholder={currentUser ? currentUser.height.toString() : ''}
-                value={updatedUser.height[0].toString()}
-                onChangeText={value => handleHeightChange('feet', value)}
-                keyboardType="numeric"
-              />
+            <View style={styles.row}>
+
+                <Text style={styles.rowLabel}>Age</Text>
+
+                <View style={[styles.rowSpacer, { flexDirection: 'row', alignItems: 'center' }]}>
+                    {/* Empty space to push the text further right */}
+                    <View style={{ flex: 1 }}></View>
+
+                    {/* Text input */}
+                    <TextInput
+                    style={{ backgroundColor: '#ccc', borderRadius: 8, padding: 8, marginLeft: 8 }}
+                    placeholderTextColor="#999"
+                    placeholder="Age"
+                    value={updatedUser.age.toString()}
+                    onChangeText={value => handleChange('age', value)}
+                    keyboardType="numeric"
+                    />
+                </View>
             </View>
-            <View style={styles.weightInput}>
-              <Text style={styles.inputLabel}>inches</Text>
-              <TextInput
-                placeholderTextColor="#555"
-                style={styles.input}
-                placeholder={currentUser ? (currentUser.height.toString() * 0.453592).toFixed(2) : ''}
-                value={updatedUser.height[1].toString()}
-                onChangeText={value => handleHeightChange('inches', value)}
-                keyboardType="numeric"
-              />
+
+            <View style={styles.row}>
+
+                <Text style={styles.rowLabel}>Height</Text>
+
+                <View style={[styles.rowSpacer, { flexDirection: 'row', alignItems: 'center' }]}>
+                    {/* Empty space to push the text further right */}
+                    <View style={{ flex: 1 }}></View>
+
+                    {/* Text input */}
+                    <TextInput
+                        placeholderTextColor="#555"
+                        style={{ backgroundColor: '#ccc', borderRadius: 8, padding: 8, marginLeft: 8 }}
+                        placeholder={currentUser ? currentUser.height.toString() : ''}
+                        value={updatedUser.height[0].toString()}
+                        onChangeText={value => handleHeightChange('feet', value)}
+                        keyboardType="numeric"
+                    />
+                    <TextInput
+                        style={{ backgroundColor: '#ccc', borderRadius: 8, padding: 8, marginLeft: 8 }}
+                        placeholderTextColor="#555"
+                        placeholder={currentUser ? (currentUser.height.toString() * 0.453592).toFixed(2) : ''}
+                        value={updatedUser.height[1].toString()}
+                        onChangeText={value => handleHeightChange('inches', value)}
+                        keyboardType="numeric"
+                    />
+                    
+                </View>
             </View>
 
             <View style={styles.row}>
